@@ -1,0 +1,163 @@
+#main_layout{
+    -fx-background-image: url("@../../../assets/textures/texture-background.png");
+    -fx-background-repeat: repeat;
+    -fx-background-position: center center;
+}
+
+#tittle_layout{
+
+     /* -fx-hgap: 20px;
+    -fx-padding: 40px; */
+         
+        /* -fx-background-color: #2969c0; */
+    -fx-background-image: url("@../../../assets/textures/texture-brown.png");
+    -fx-background-repeat: repeat;
+    -fx-background-position: center center;
+
+    -fx-background-radius: 50px;
+
+        
+    -fx-border-radius: 20px;
+    -fx-border-width: 5px;
+    /* -fx-border-color: black; */
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 10, 0, 0, 0);
+
+}
+#ball_count{
+    -fx-background-image: url("@../../../assets/ball_count.png");
+    -fx-background-repeat: stretch;
+    -fx-background-position: center center;
+}
+#holeT{
+    -fx-background-color: #fcbc6a;
+
+    -fx-background-radius: 120px;
+
+    -fx-border-radius: 20px;
+    -fx-border-width: 50px;
+    /* -fx-border-color: black; */
+    -fx-effect: dropshadow(two-pass-box, rgba(0, 0, 0, 0.25), 10, -1.0, -5.0, 0.08);
+    -fx-effect: innershadow(three-pass-box , rgba(0, 0, 0, 0.17) , 10 , 0.57, 0.3 , 0.6);
+    -fx-effect: innershadow(three-pass-box , rgba(97, 57, 0, 0.48) , 10 , 0, 0.5 , 5.0);
+
+
+}
+
+#hole_style{
+    -fx-background-image: url("@../../../assets/textures/texture-background.png");
+    -fx-background-repeat: repeat;
+    -fx-background-position: center center;
+}
+
+#window {
+
+    -fx-background-image: url("@../../../assets/win_window2.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: 100% 100%;
+
+    -fx-background-color: #F3A31C;
+    -fx-background-radius: 200px;
+    -fx-effect: dropshadow(three-pass-box, rgba(100, 58, 0, 0.48), 20, 0, 0, 3);
+
+
+    /*
+    -fx-background-color: #F3A31C;
+    -fx-background-radius: 20px;
+    -fx-effect: dropshadow(three-pass-box, rgba(100, 58, 0, 0.48), 20, 0, 0, 3);
+
+    /*InnerShadow blurType="GAUSSIAN" height="25.24" offsetY="4.0" radius="5.81" width="0.0">*/
+}
+
+.button {
+
+    /*
+    -fx-background-image: url("@../../../assets/Buttons/Button.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: 100% 100%;
+
+    -fx-background-color: #D59542;
+    -fx-background-radius: 200px;
+    -fx-effect: dropshadow(three-pass-box, rgba(100, 58, 0, 0.48), 20, 0, 0, 3);*/
+
+
+    -fx-background-color: #D59542;
+    -fx-background-radius: 14px;
+    -fx-effect: dropshadow(two-pass-box, rgba(100, 58, 0, 0.48), 2.3, 2, 0, 3);
+    -fx-effect: dropshadow(two-pass-box, rgba(0, 0, 0, 0.25), 3.6, 0, 0, -2);
+    -fx-effect: innershadow(three-pass-box, rgba(0, 0, 0, 0.25), 4, 0, 0, -2.0);
+
+
+
+    /*InnerShadow blurType="GAUSSIAN" height="25.24" offsetY="4.0" radius="5.81" width="0.0">*/
+}
+
+.button:pressed {
+
+    /*
+    -fx-background-image: url("@../../../assets/Buttons/Button-pressed.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: 100% 100%;
+
+    -fx-background-color: #D59542;
+    -fx-background-radius: 200px;
+    -fx-effect: dropshadow(three-pass-box, rgba(100, 58, 0, 0.48), 20, 0, 0, 3);
+    */
+
+
+
+    -fx-background-color: #D59542;
+    -fx-background-radius: 14px;
+    -fx-effect: dropshadow(two-pass-box, rgba(0, 0, 0, 0.25), 3.6, 0, 0, -2);
+    -fx-effect: innershadow(three-pass-box, rgba(0, 0, 0, 0.08), 3.4, 0, -2, 12);
+    -fx-effect: innershadow(three-pass-box, rgba(100, 59, 0, 0.48), 2.3, 2, 0, 3.0);
+
+
+}
+    /*
+    -fx-background-image: url("@../../../assets/texture-brown.png");
+    -fx-background-repeat: stretch;   
+    -fx-background-position: center center;
+    -fx-border-radius: 19px;
+    -fx-text-fill: white;
+    -fx-background-color: linear-gradient( #2ebefb 0%, #0085FF 100%);
+    -fx-background-radius: 30;
+    -fx-background-insets: 0;
+
+    -fx-border-radius: 14px;
+    -fx-background-image: url("@../../../assets/texture-brown.png");
+    -fx-box-shadow: 0px -2px 4px 0px rgba(0, 0, 0, 0.25) inset, 0px -2px 3.6px 0px rgba(0, 0, 0, 0.25), 0px 3px 2.3px 2px rgba(100, 59, 0, 0.48);
+    
+    
+}
+/*
+.button:hover {
+    
+    -fx-border-radius: 19px;
+    -fx-background-color: linear-gradient( #2ebefb 0%, #ffffff 100%);
+    -fx-background-radius: 30;
+    -fx-background-insets: 0;
+    -fx-text-fill: white;
+
+    -fx-box-shadow: 0px 4px 10px 4px rgba(255, 255, 255, 0.42) inset;
+    -fx-transform: scale(1.05);
+    
+}
+.button:pressed {
+
+}
+
+/*
+.button {
+    -fx-background-color: dodgerblue;
+}
+
+.button:hover {
+    -fx-background-color: red;
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 1.1;
+
+    transition: -fx-background-color 0.5s ease,
+                -fx-scale-x 0.5s ease,
+                -fx-scale-y 0.5s ease;
+}
+*/
