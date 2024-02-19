@@ -3,6 +3,7 @@ package com.point.mancala;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -17,9 +18,20 @@ public class General {
     protected final boolean developmentMode = true;
     protected static final List<Color> COLORS = List.of(Color.GREEN, Color.RED, Color.BLUE, Color.ORANGE);
     //ArrayList<Short> holesBallsCount = new ArrayList<Short>(12); // a list that contain the amount of balls in each hole (include the mains)
-    HashMap<Short, ArrayList<Object>> hols; // hasMap that contain the index of the hole in the key and a list of the hole data
-    //example: holeIndex: {(the amount of balls), (gridHole object), (AnchorPane object) (ball count label object) }
-    // index -1 = P1 main hole, 13 = P2 main hole
+    HashMap<Short, ArrayList<Object>> HOLES = new HashMap<>(14); // hasMap that contain the index of the hole in the key and a list of the hole data
+    //example: holeIndex: {(the amount of balls), (gridHole object), (AnchorPane object) (Rectangle shape) (ball count label object) }
+    // index -1 = P1 main hole, 12 = P2 main hole
+    protected final short P1_MAIN_HOLE_KEY = -1;
+    protected final short P2_MAIN_HOLE_KEY = 12;
+    protected final short BALLS_COUNT_INDEX = 0;
+    protected final short GRID_INDEX = 1;
+    protected final short ANCHORPANE_INDEX = 2;
+    protected final short RECTANGLE_INDEX = 3;
+    protected final short LABLE_INDEX = 4;
+
+
+
+
     protected short p1_balls_holes = 0; // the amount of balls in P1 main hole
     protected short p2_balls_holes = 0; // the amount of balls in P2 main hole
 
