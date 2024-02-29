@@ -1,6 +1,7 @@
 module com.point.mancala.mancala {
     requires javafx.controls;
     requires javafx.fxml;
+    requires java.desktop;
 
 
     opens com.point.mancala to javafx.fxml;

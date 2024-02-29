@@ -138,3 +138,34 @@
     -fx-background-repeat: no-repeat;
     -fx-background-size: 100% 100%;
 }
+#new_game {
+    -fx-background-image: url("@../../../assets/Buttons/New.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: 100% 100%;
+}
+#new_game:pressed {
+    -fx-background-image: url("@../../../assets/Buttons/New-pressed.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: 100% 100%;
+}
+
+#sound_btn {
+    -fx-background-image: url("@../../../assets/Buttons/Sound.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: 100% 100%;
+}
+#sound_btn:pressed {
+    -fx-background-image: url("@../../../assets/Buttons/Sound-pressed.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: 100% 100%;
+}
+#sound_off_btn {
+    -fx-background-image: url("@../../../assets/Buttons/Sound-off.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: 100% 100%;
+}
+#sound_off_btn:pressed {
+    -fx-background-image: url("@../../../assets/Buttons/Sound-off-pressed.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: 100% 100%;
+}

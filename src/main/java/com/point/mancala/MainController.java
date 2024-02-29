@@ -7,7 +7,7 @@ import javafx.stage.Stage;
 
 import static com.point.mancala.General.*;
 
-public class MainController {
+public class MainController extends UIUX {
     public static Stage primaryStage;
     @FXML
     protected void pvpClick() throws Exception {
@@ -46,4 +46,6 @@ public class MainController {
         }*/
 
     }
+
+
 }

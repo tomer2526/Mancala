@@ -1,9 +1,13 @@
 package com.point.mancala;
 
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+
+import javax.sound.sampled.*;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,7 +15,7 @@ import java.util.List;
 
 import static com.point.mancala.GameType.*;
 
-public class General {
+public class General extends UIUX {
     protected static GameType GAME_TYPE;
     // The name of the Game
     protected static String GAME_TYPE_NAME;
@@ -39,27 +43,23 @@ public class General {
         GAME_TYPE = PVP;
         GAME_TYPE_NAME = "Player VS Player";
         logAction("start PVP game", 2);
-        FXMLLoader fxmlLoader = new FXMLLoader(Game.class.getResource("game.fxml"));
-        Scene scene = new Scene(fxmlLoader.load());
-        primaryStage.setTitle(GAME_TYPE_NAME);
-        //primaryStage.setResizable(false);
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        startGame(primaryStage);
     }
     public static void startPVC(Stage primaryStage) throws IOException {
         GAME_TYPE = PVC;
         GAME_TYPE_NAME = "Player VS CPU";
         logAction("start PVC game", 2);
-        FXMLLoader fxmlLoader = new FXMLLoader(Game.class.getResource("game.fxml"));
-        Scene scene = new Scene(fxmlLoader.load());
-        primaryStage.setTitle(GAME_TYPE_NAME);
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        startGame(primaryStage);
     }
     public static void startCVC(Stage primaryStage) throws IOException {
         GAME_TYPE = CVC;
         GAME_TYPE_NAME = "CPU VS CPU";
         logAction("start CVC game", 2);
+        startGame(primaryStage);
+    }
+
+    private static void startGame(Stage primaryStage) throws IOException {
+        playSound("src/main/resources/assets/sound effects/start game sound.wav");
         FXMLLoader fxmlLoader = new FXMLLoader(Game.class.getResource("game.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         primaryStage.setTitle(GAME_TYPE_NAME);

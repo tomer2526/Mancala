@@ -27,7 +27,7 @@
            </Label>
        </HBox>
        <VBox fx:id="buttons_layout" alignment="CENTER" maxWidth="-Infinity" prefHeight="200.0" spacing="50.0">
-           <Button id="button" fx:id="pvp" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#pvpClick" stylesheets="@../../../css/style.css" text="2 Player Mode" textAlignment="CENTER" textFill="#5b3804">
+           <Button id="button" fx:id="pvp" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#pvpClick" onMousePressed="#small_btn_in_sound" onMouseReleased="#small_btn_out_sound" stylesheets="@../../../css/style.css" text="2 Player Mode" textAlignment="CENTER" textFill="#5b3804">
                <font>
                    <Font name="Coda ExtraBold" size="22.0" />
                </font>
@@ -35,7 +35,7 @@
                <Insets />
             </VBox.margin>
            </Button>
-           <Button id="button" fx:id="pvc" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#pvcClick" prefWidth="201.0" text="Player VS CPU" textAlignment="CENTER" textFill="#543304">
+           <Button id="button" fx:id="pvc" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#pvcClick" onMousePressed="#small_btn_in_sound" onMouseReleased="#small_btn_out_sound" prefWidth="201.0" text="Player VS CPU" textAlignment="CENTER" textFill="#543304">
                <font>
                    <Font name="Coda ExtraBold" size="22.0" />
                </font>
@@ -61,7 +61,7 @@
                    </DropShadow>
                </effect>
            </Button>
-           <Button id="button" fx:id="cvc" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#cvcClick" text="CPU VS CPU" textAlignment="CENTER" textFill="#543304">
+           <Button id="button" fx:id="cvc" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#cvcClick" onMousePressed="#small_btn_in_sound" onMouseReleased="#small_btn_out_sound" text="CPU VS CPU" textAlignment="CENTER" textFill="#543304">
                <font>
                    <Font name="Coda ExtraBold" size="22.0" />
                </font>
@@ -72,7 +72,7 @@
        </VBox>
       <HBox alignment="BOTTOM_LEFT" maxHeight="1.7976931348623157E308" prefWidth="200.0">
          <children>
-            <Button id="button" fx:id="instructions" mnemonicParsing="false" onAction="#instructions" prefHeight="50.0" prefWidth="50.0" text="i" textAlignment="CENTER" textFill="#543304">
+            <Button id="button" fx:id="instructions" mnemonicParsing="false" onAction="#instructions" onMousePressed="#small_btn_in_sound" onMouseReleased="#small_btn_out_sound" prefHeight="50.0" prefWidth="50.0" text="i" textAlignment="CENTER" textFill="#543304">
                <font>
                   <Font name="Coda ExtraBold" size="20.0" />
                </font>

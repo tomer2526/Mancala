@@ -54,8 +54,6 @@ public class GameController extends General implements Initializable {
     @FXML
     private Label game_type;
     @FXML
-    private Label new_game_button;
-    @FXML
     private VBox game_board;
     @FXML
     private HBox holes_row1;
@@ -83,11 +81,21 @@ public class GameController extends General implements Initializable {
     private Label winner_player;
     @FXML
     private Button pausePlay;
+    @FXML
+    private Button soundToggle;
 
 
 
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
+
+        if(gameSound) {
+            soundToggle.setId("sound_btn");
+        }
+        else {
+            soundToggle.setId("sound_off_btn");
+        }
+
         ObservableList<Node> row1_Children = holes_row1.getChildren();
         ObservableList<Node> row2_Children = holes_row2.getChildren();
         //fade buttons
@@ -163,6 +171,7 @@ public class GameController extends General implements Initializable {
 
         // CPU action (if the CPU turn and not PVP mode)
         if (GAME_TYPE == CVC) {
+            pausePlay.setVisible(true);
             CPUAction(gameTurn);
         }
     }
@@ -327,6 +336,7 @@ public class GameController extends General implements Initializable {
 
                     canPlay = true;
                 }
+                select_hole_sound();
                 // CPU action (if the CPU turn and not PVP mode)
                 if ((GAME_TYPE == PVC && !gameTurn) || GAME_TYPE == CVC) {
                     CPUAction(gameTurn);
@@ -370,43 +380,36 @@ public class GameController extends General implements Initializable {
 
        logAction("new_game_button", 3);
         // Fade animation
-        animation.fadeAnimation(new_game_button, 500, false);
+        //animation.fadeAnimation(new_game_button, 500, false);
         // Open new game window
         new Main().start(new Stage());
 
     }
     @FXML
-    protected void new_game_button_hover(MouseEvent event) {
-        Label label = (Label) event.getSource();
-        label.setTextFill(Color.web("rgb(255, 255, 255)"));
-    }
-    @FXML
-    protected void new_game_button_not_hover(MouseEvent event) {
-        Label label = (Label) event.getSource();
-        label.setTextFill(Color.web("#ffffffc2"));
-    }
-    @FXML
     protected void holeMouseHover(MouseEvent event) {
         //System.out.println("holePressedDown()");
         short holeKey = getHoleKey((AnchorPane) event.getSource());
-
         if(gameTurn) {
             if (holeKey >= 0 && holeKey < 6 && (GAME_TYPE != CVC)) {
                 // If clickable
+                hover_sound();
                 highlightHole(holeKey,Color.WHEAT, true);
             }
             else {
                 // If not clickable
+                disable_hover_sound();
                 highlightHole(holeKey,Color.rgb(255,255,255,0.21), true);
             }
         }
         else {
             if (holeKey >= 6 && holeKey < 12 && (GAME_TYPE == PVP)) {
-                // If not clickable
+                // If clickable
+                hover_sound();
                 highlightHole(holeKey,Color.WHEAT, true);
             }
             else {
                 // If not clickable
+                disable_hover_sound();
                 highlightHole(holeKey,Color.rgb(255,255,255,0.21), true);
             }
         }
@@ -422,12 +425,17 @@ public class GameController extends General implements Initializable {
     }
 
     public void holeClicked(short holeIndex) throws IOException {
-        if((GAME_TYPE == PVC && gameTurn) || GAME_TYPE == PVP)
-            selectHole(holeIndex);
-        else if (GAME_TYPE == CVC)
+        if((GAME_TYPE == PVC && gameTurn) || GAME_TYPE == PVP){
+            select_hole_sound();
+            selectHole(holeIndex);}
+        else if (GAME_TYPE == CVC){
+            disable_btn_sound();
             logAction("Hole can't be selected in CVC mode.");
-        else
+        }
+        else{
+            disable_btn_sound();
             logAction("Hole can't be selected - it is not the user turn.");
+        }
     }
 
 
@@ -654,6 +662,8 @@ public class GameController extends General implements Initializable {
         startPVP(new Stage());
     }
 
+
+
     @FXML
     protected void pausePlay(){
         if(pause) {
@@ -661,6 +671,7 @@ public class GameController extends General implements Initializable {
             pause = false;
             if (waitingQueue != -2)
             {
+                logAction("hole "+ waitingQueue + " has selected from the waiting queue.", 2);
                 selectHole(waitingQueue);
                 waitingQueue = -2;
             }
@@ -674,6 +685,18 @@ public class GameController extends General implements Initializable {
         }
 
     }
+    @FXML
+    protected void soundToggle(){
+        if(gameSound) {
+            soundToggle.setId("sound_off_btn");
+            gameSound = false;
+        }
+        else {
+            soundToggle.setId("sound_btn");
+            gameSound = true;
+        }
+
+    }
 
 
 
@@ -683,27 +706,13 @@ public class GameController extends General implements Initializable {
 
         if(!isGameOver) {
             logAction("Wait for CPU action");
+
+            //list with 2 parameters - index 0 = the start holeKey of the player and index 1 = the last holeKey of the player.
             short[] holesRange = CPU_player ? P1_holesRange : P2_holesRange;
-            short holeKey = holesRange[0];
+            short holeKey = getMaxBallsHole(CPU_player, holesRange);
 
-
-            // get the holeKey with the max num of balls.
-            short maxBallCount = getHoleBallCount(holeKey);
-            short temp;
-            for (short i = (short) (holesRange[0] + 1); i <= holesRange[1]; i++) {
-                temp = getHoleBallCount(i);
-                if (maxBallCount < temp) {
-                    maxBallCount = temp;
-                    holeKey = i;
-                }
-
-            }
-
-
-            logAction("CPU selected: " + holeKey);
+            logAction("CPU choice: " + holeKey);
             highlightHole(holeKey, Color.RED, true);
-
-
 
             // Set delay for select
             short finalHoleKey = holeKey;
@@ -715,6 +724,39 @@ public class GameController extends General implements Initializable {
             timeline.play();
         }
     }
+
+
+
+
+    // Functions for CPU logic
+
+    // This function returns the holeKey that you can use to apply the law of parallelism
+    public short bestHoleForParallelLaw(boolean player, short[] holesRange)  {
+
+        return 0;
+    }
+
+    // This function returns the holeKey that can give you another turn
+    public short bestHoleToGetAnotherTurn(boolean player, short[] holesRange)  {
+        return 0;
+    }
+
+    // This function returns the holeKey with the most balls
+    public short getMaxBallsHole(boolean player, short[] holesRange)  {
+
+        short holeKey = holesRange[0];
+        short maxBallCount = getHoleBallCount(holeKey);
+        short temp;
+        for (short i = (short) (holesRange[0] + 1); i <= holesRange[1]; i++) {
+            temp = getHoleBallCount(i);
+            if (maxBallCount < temp) {
+                maxBallCount = temp;
+                holeKey = i;
+            }
+        }
+        return holeKey;
+    }
+
 
 
 }

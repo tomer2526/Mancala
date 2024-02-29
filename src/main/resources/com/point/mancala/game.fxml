@@ -59,26 +59,24 @@
                <right>
                   <HBox alignment="CENTER" spacing="10.0" BorderPane.alignment="CENTER">
                      <children>
-                        <Label fx:id="new_game_button" alignment="CENTER_RIGHT" contentDisplay="CENTER" onMouseClicked="#new_game_button" onMouseEntered="#new_game_button_hover" onMouseExited="#new_game_button_not_hover" prefHeight="40.0" text="New Game" textAlignment="CENTER" textFill="#ffffffc2">
+                        <Button id="pause" fx:id="pausePlay" mnemonicParsing="false" onAction="#pausePlay" onMousePressed="#small_btn_in_sound" onMouseReleased="#small_btn_out_sound" prefHeight="45.0" prefWidth="45.0" textAlignment="CENTER" textFill="#543304" visible="false">
                            <font>
-                              <Font name="Coda ExtraBold" size="25.0" />
+                              <Font name="Coda ExtraBold" size="20.0" />
                            </font>
-                           <effect>
-                              <InnerShadow blurType="GAUSSIAN" height="3.16" radius="0.29000000000000004" width="0.0">
-                                 <color>
-                                    <Color opacity="0.2997131943702698" />
-                                 </color>
-                              </InnerShadow>
-                           </effect>
-                        </Label>
-                        <Button id="pause" fx:id="pausePlay" mnemonicParsing="false" onAction="#pausePlay" prefHeight="45.0" prefWidth="45.0" textAlignment="CENTER" textFill="#543304">
+                        </Button>
+                        <Button id="sound_btn" fx:id="soundToggle" mnemonicParsing="false" onAction="#soundToggle" onMousePressed="#small_btn_in_sound" onMouseReleased="#small_btn_out_sound" prefHeight="45.0" prefWidth="45.0" textAlignment="CENTER" textFill="#543304">
+                           <font>
+                              <Font name="Coda ExtraBold" size="20.0" />
+                           </font>
+                        </Button>
+                        <Button id="new_game" fx:id="new_game_button" mnemonicParsing="false" onAction="#new_game_button" onMousePressed="#small_btn_in_sound" onMouseReleased="#small_btn_out_sound" prefHeight="45.0" prefWidth="45.0" textAlignment="CENTER" textFill="#543304">
                            <font>
                               <Font name="Coda ExtraBold" size="20.0" />
                            </font>
                         </Button>
                      </children>
                      <padding>
-                        <Insets left="80.0" />
+                        <Insets left="140.0" />
                      </padding>
                   </HBox>
                </right>
