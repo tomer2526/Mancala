@@ -3,9 +3,7 @@ package com.point.mancala;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,6 +13,8 @@ import static com.point.mancala.GameType.*;
 
 public class General {
     protected static GameType GAME_TYPE;
+    // The name of the Game
+    protected static String GAME_TYPE_NAME;
     protected final boolean developmentMode = true;
     protected static final List<Color> COLORS = List.of(Color.GREEN, Color.RED, Color.BLUE, Color.ORANGE);
     //ArrayList<Short> holesBallsCount = new ArrayList<Short>(12); // a list that contain the amount of balls in each hole (include the mains)
@@ -29,40 +29,55 @@ public class General {
     protected final short RECTANGLE_INDEX = 3;
     protected final short LABLE_INDEX = 4;
 
+    // The range of player1 holeKeys that can be selected
+    protected static final short[] P1_holesRange = {0,5};
+    // The range of player2 holeKeys that can be selected
+    protected static final short[] P2_holesRange = {6 ,11};
 
-
-
-    protected short p1_balls_holes = 0; // the amount of balls in P1 main hole
-    protected short p2_balls_holes = 0; // the amount of balls in P2 main hole
 
     public static void startPVP(Stage primaryStage) throws IOException {
         GAME_TYPE = PVP;
+        GAME_TYPE_NAME = "Player VS Player";
         logAction("start PVP game", 2);
         FXMLLoader fxmlLoader = new FXMLLoader(Game.class.getResource("game.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
-        primaryStage.setTitle("PVP Game");
+        primaryStage.setTitle(GAME_TYPE_NAME);
         //primaryStage.setResizable(false);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
     public static void startPVC(Stage primaryStage) throws IOException {
         GAME_TYPE = PVC;
+        GAME_TYPE_NAME = "Player VS CPU";
         logAction("start PVC game", 2);
         FXMLLoader fxmlLoader = new FXMLLoader(Game.class.getResource("game.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
-        primaryStage.setTitle("PVC Game");
+        primaryStage.setTitle(GAME_TYPE_NAME);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
     public static void startCVC(Stage primaryStage) throws IOException {
         GAME_TYPE = CVC;
+        GAME_TYPE_NAME = "CPU VS CPU";
         logAction("start CVC game", 2);
         FXMLLoader fxmlLoader = new FXMLLoader(Game.class.getResource("game.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
-        primaryStage.setTitle("CVC Game");
+        primaryStage.setTitle(GAME_TYPE_NAME);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
+
+
+
+    //return the amount of balls int the provided hole
+    protected short getHoleBallCount(short holeKey)
+    {
+        //return hole.getChildren().size() - BALLS_START_INDEX;
+        return (short) HOLES.get(holeKey).getFirst(); // BALLS_COUNT_INDEX -> firstIndex
+    }
+
+
+
 
     // print log message
     // importance: the level of importance of this log.

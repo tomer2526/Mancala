@@ -8,21 +8,26 @@ import javafx.stage.Stage;
 import static com.point.mancala.General.*;
 
 public class MainController {
-    Stage primaryStage;
+    public static Stage primaryStage;
     @FXML
     protected void pvpClick() throws Exception {
         //open new game window
         startPVP(new Stage());
+//        Stage stage = (Stage) .getScene().getWindow();
+//        // do what you have to do
+//        stage.close();
     }
     @FXML
     protected void pvcClick() throws Exception {
         //open new game window
         startPVC(new Stage());
+        //primaryStage.close();
     }
     @FXML
     protected void cvcClick() throws Exception {
         //open new game window
         startCVC(new Stage());
+        //primaryStage.close();
     }
 
     @FXML
