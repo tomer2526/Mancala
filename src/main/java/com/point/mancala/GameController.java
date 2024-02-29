@@ -6,6 +6,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
@@ -19,9 +20,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import static com.point.mancala.GameType.*;
 
@@ -39,10 +37,17 @@ public class GameController extends General implements Initializable {
     protected AnchorPane[] holes;
     protected boolean canPlay = true; // Indicate if any player can play, when loading time is over it will be trues
     protected boolean isGameOver = false; // if a player win this var will be true;
+    protected boolean pause = false; // if the user pause the game;
+
     protected static boolean gameTurn = true; // Player 1 turn = true, player 2 false
     protected short lastHole; // The last hole that a ball got into
 
-    protected final Duration dellay = Duration.millis(1);
+    protected final Duration dellay = Duration.millis(500);
+
+    // if the user pause the game and the cpu select hole after the pause, it will get into the waitingQueue
+    // and will be selected  and will be selected after the user resume the game
+    // if waitingQueue = -2 it means that there is nothing in the queue
+    protected short waitingQueue = -2;
 
     @FXML
     private BorderPane win_window;
@@ -76,6 +81,8 @@ public class GameController extends General implements Initializable {
     private Label game_turn_label;
     @FXML
     private Label winner_player;
+    @FXML
+    private Button pausePlay;
 
 
 
@@ -163,175 +170,172 @@ public class GameController extends General implements Initializable {
     protected void selectHole(short holeKey) {
 
         if (canPlay || !isGameOver) {
-            // The first item is - Rectangle hole_style we want just the balls witch is from index 1
-            short ballsCount = getHoleBallCount(holeKey);
-            short i;
-            logAction("Hole" + holeKey + " selected", 2);
-            boolean canClick; // if the hole can be pressed (if is the player turn)
-
-            // check if is the player turn (if the player's row can be clicked new)
-            if (gameTurn) {
-                canClick = (holeKey >= 0 && holeKey < 6);
+            if (pause) {
+                waitingQueue = holeKey;
             } else {
-                canClick = (holeKey >= 6 && holeKey < 12);
-            }
+                // The first item is - Rectangle hole_style we want just the balls witch is from index 1
+                short ballsCount = getHoleBallCount(holeKey);
+                short i;
+                logAction("Hole" + holeKey + " selected", 2);
+                boolean canClick; // if the hole can be pressed (if is the player turn)
 
-            short nextHoleKey = holeKey;
-            if (canClick && ballsCount > 0) {
-
-
-                canPlay = false;
-                //move every ball in the hole to the next holes
-                if (holeKey == 0) {
-                    nextHoleKey = P1_MAIN_HOLE_KEY; // the next hole after p1 hole
-                } else if (holeKey == 11) {
-                    nextHoleKey = P2_MAIN_HOLE_KEY; // the next hole after p2 hole
+                // check if is the player turn (if the player's row can be clicked new)
+                if (gameTurn) {
+                    canClick = (holeKey >= 0 && holeKey < 6);
                 } else {
-                    //if the holeIndex is in row2 we need to move forward (increase the index by 1) in the holes list
-                    if (holeKey >= 6) {
-                        nextHoleKey++;
-                    } else {
-                        //if the holeIndex is in row1 we need to move backwards (reduce the index by 1) in the holes list
-                        nextHoleKey--;
-                    }
+                    canClick = (holeKey >= 6 && holeKey < 12);
                 }
 
-                for (i = 0; i < ballsCount; i++) {
-                    moveBallTo(holeKey, nextHoleKey);
-                    this.lastHole = nextHoleKey;
+                short nextHoleKey = holeKey;
+                if (canClick && ballsCount > 0) {
 
-                    if (nextHoleKey == P1_MAIN_HOLE_KEY) {
-                        nextHoleKey = 6; // the next hole after p1 hole
-                    } else if (nextHoleKey == P2_MAIN_HOLE_KEY) {
-                        nextHoleKey = 5; // the next hole after p2 hole
+
+                    canPlay = false;
+                    //move every ball in the hole to the next holes
+                    if (holeKey == 0) {
+                        nextHoleKey = P1_MAIN_HOLE_KEY; // the next hole after p1 hole
+                    } else if (holeKey == 11) {
+                        nextHoleKey = P2_MAIN_HOLE_KEY; // the next hole after p2 hole
                     } else {
                         //if the holeIndex is in row2 we need to move forward (increase the index by 1) in the holes list
-                        if (nextHoleKey >= 6 && nextHoleKey <= 11) {
+                        if (holeKey >= 6) {
                             nextHoleKey++;
                         } else {
                             //if the holeIndex is in row1 we need to move backwards (reduce the index by 1) in the holes list
                             nextHoleKey--;
                         }
                     }
-                    logAction("Last hole: " + this.lastHole, 2);
-                    //make delay
-                }
 
+                    for (i = 0; i < ballsCount; i++) {
+                        moveBallTo(holeKey, nextHoleKey);
+                        this.lastHole = nextHoleKey;
 
-                //if the last ball get into the player's hole, he will get another turn
-                if (gameTurn && (this.lastHole == P1_MAIN_HOLE_KEY))
-                {
-                    if(isAllPlayerHolesEmpty(true)){
-                        changeTurn(true);
-                    }else {
-                        // player 1 get another turn
-                        Animations sa = new Animations();
-                        sa.scale(game_turn_label, 300, 1.1, false);
+                        if (nextHoleKey == P1_MAIN_HOLE_KEY) {
+                            nextHoleKey = 6; // the next hole after p1 hole
+                        } else if (nextHoleKey == P2_MAIN_HOLE_KEY) {
+                            nextHoleKey = 5; // the next hole after p2 hole
+                        } else {
+                            //if the holeIndex is in row2 we need to move forward (increase the index by 1) in the holes list
+                            if (nextHoleKey >= 6 && nextHoleKey <= 11) {
+                                nextHoleKey++;
+                            } else {
+                                //if the holeIndex is in row1 we need to move backwards (reduce the index by 1) in the holes list
+                                nextHoleKey--;
+                            }
+                        }
+                        logAction("Last hole: " + this.lastHole, 2);
+                        //make delay
                     }
-                }
-                else {
-                    if (!gameTurn && (this.lastHole == P2_MAIN_HOLE_KEY)) {
-                        if(isAllPlayerHolesEmpty(false)){
-                            changeTurn(false);
-                        }else {
-                            // Player 2 get another turn
+
+
+                    //if the last ball get into the player's hole, he will get another turn
+                    if (gameTurn && (this.lastHole == P1_MAIN_HOLE_KEY)) {
+                        if (isAllPlayerHolesEmpty(true)) {
+                            changeTurn(true);
+                        } else {
+                            // player 1 get another turn
                             Animations sa = new Animations();
                             sa.scale(game_turn_label, 300, 1.1, false);
                         }
                     } else {
-                        int lastHoleBallCount = getHoleBallCount(this.lastHole);
-
-                        // If the last ball get into an empty hole of
-                        if(gameTurn && lastHoleBallCount == 1 && holeKey != P1_MAIN_HOLE_KEY && holeKey != P2_MAIN_HOLE_KEY)
-                        {
-                            short parallelHoleKey = (short) (this.lastHole + 6);
-
-                            // Take the parallel hole balls just if the last ball of player 1 end in his own hole and the parallel hole have at least 1 ball
-                            // So if the parallelHoleId is grater then 11 it means that the last ball is not landed in the player 1 era
-                            if(parallelHoleKey <= 11) {
-                                // get the parallel hole
-
-
-                                // Check if the parallel hole have at least 1 ball
-                                if(getHoleBallCount(parallelHoleKey) > 0)
-                                {
-                                    logAction("Player 1 last ball got into an empty hole", 1);
-
-                                    // Move all the balls from the parallel hole to player 1 hole
-                                    short parallelHoleBallsCount = getHoleBallCount(parallelHoleKey);
-                                    for (short j = 0; j < parallelHoleBallsCount; j++) {
-                                        moveBallTo(parallelHoleKey, P1_MAIN_HOLE_KEY);
-                                    }
-                                    // Move the last ball from the last hole to player 1 hole
-                                    moveBallTo(lastHole, P1_MAIN_HOLE_KEY);
-
-                                    // Update parallelHole and lastHole hole score
-                                    updateScore(parallelHoleKey, true);
-                                    updateScore(lastHole, true);
-                                    changeTurn(false);
-                                }
+                        if (!gameTurn && (this.lastHole == P2_MAIN_HOLE_KEY)) {
+                            if (isAllPlayerHolesEmpty(false)) {
+                                changeTurn(false);
+                            } else {
+                                // Player 2 get another turn
+                                Animations sa = new Animations();
+                                sa.scale(game_turn_label, 300, 1.1, false);
                             }
+                        } else {
+                            int lastHoleBallCount = getHoleBallCount(this.lastHole);
 
-                            // If all player2 holes are empty player1 get another turn in order to finish the game
-                            // If the ball end in an empty hole of player1, player2 should get the next turn
-                            changeTurn(isAllPlayerHolesEmpty(true));
+                            // If the last ball get into an empty hole of
+                            if (gameTurn && lastHoleBallCount == 1 && holeKey != P1_MAIN_HOLE_KEY && holeKey != P2_MAIN_HOLE_KEY) {
+                                short parallelHoleKey = (short) (this.lastHole + 6);
 
-                        }
-                        else if(!gameTurn && (lastHoleBallCount == 1) && holeKey != P1_MAIN_HOLE_KEY && holeKey != P2_MAIN_HOLE_KEY) {
+                                // Take the parallel hole balls just if the last ball of player 1 end in his own hole and the parallel hole have at least 1 ball
+                                // So if the parallelHoleId is grater then 11 it means that the last ball is not landed in the player 1 era
+                                if (parallelHoleKey <= 11) {
+                                    // get the parallel hole
 
-                            short parallelHoleId = (short) (this.lastHole - 6);
 
-                            // take the parallel hole balls to the player's main hole just if the last ball of player 2 end in his own hole and the parallel hole have at least 1 ball
-                            // so if the parallelHoleId is smaller than 0 it means that the last ball is not landed in the player 2 era
-                            if (parallelHoleId >= 0) {
-                                // get the parallel hole
-                                //GridPane parallelHole = getHoleFromId(parallelHoleId);
+                                    // Check if the parallel hole have at least 1 ball
+                                    if (getHoleBallCount(parallelHoleKey) > 0) {
+                                        logAction("Player 1 last ball got into an empty hole", 1);
 
-                                // check if the parallel hole have at least 1 ball
-                                if (getHoleBallCount(parallelHoleId) > 0) {
-                                    logAction("Player 2 last ball got into an empty hole", 1);
+                                        // Move all the balls from the parallel hole to player 1 hole
+                                        short parallelHoleBallsCount = getHoleBallCount(parallelHoleKey);
+                                        for (short j = 0; j < parallelHoleBallsCount; j++) {
+                                            moveBallTo(parallelHoleKey, P1_MAIN_HOLE_KEY);
+                                        }
+                                        // Move the last ball from the last hole to player 1 hole
+                                        moveBallTo(lastHole, P1_MAIN_HOLE_KEY);
 
-                                    // move the balls from the parallel hole and the last hole to player 2 hole
-                                    int parallelHoleBallsCount = getHoleBallCount(parallelHoleId);
-                                    for (int j = 0; j < parallelHoleBallsCount; j++) {
-                                        moveBallTo(parallelHoleId, P2_MAIN_HOLE_KEY);
+                                        // Update parallelHole and lastHole hole score
+                                        updateScore(parallelHoleKey, true);
+                                        updateScore(lastHole, true);
+                                        changeTurn(false);
                                     }
-                                    // move the last ball from the last hole to player 1 hole
-                                    moveBallTo(lastHole, P2_MAIN_HOLE_KEY);
-
-                                    //update parallelHole and lastHole hole score
-                                    updateScore(parallelHoleId, true);
-                                    updateScore(this.lastHole, true);
                                 }
-                            }
 
-                            // If all player1 holes are empty, player2 get another turn in order to finish the game
-                            // If the ball end in an empty hole of player 2, player 1 should get the next turn
-                            changeTurn(!isAllPlayerHolesEmpty(true));
+                                // If all player2 holes are empty player1 get another turn in order to finish the game
+                                // If the ball end in an empty hole of player1, player2 should get the next turn
+                                changeTurn(isAllPlayerHolesEmpty(true));
 
+                            } else if (!gameTurn && (lastHoleBallCount == 1) && holeKey != P1_MAIN_HOLE_KEY && holeKey != P2_MAIN_HOLE_KEY) {
+
+                                short parallelHoleId = (short) (this.lastHole - 6);
+
+                                // take the parallel hole balls to the player's main hole just if the last ball of player 2 end in his own hole and the parallel hole have at least 1 ball
+                                // so if the parallelHoleId is smaller than 0 it means that the last ball is not landed in the player 2 era
+                                if (parallelHoleId >= 0) {
+                                    // get the parallel hole
+                                    //GridPane parallelHole = getHoleFromId(parallelHoleId);
+
+                                    // check if the parallel hole have at least 1 ball
+                                    if (getHoleBallCount(parallelHoleId) > 0) {
+                                        logAction("Player 2 last ball got into an empty hole", 1);
+
+                                        // move the balls from the parallel hole and the last hole to player 2 hole
+                                        int parallelHoleBallsCount = getHoleBallCount(parallelHoleId);
+                                        for (int j = 0; j < parallelHoleBallsCount; j++) {
+                                            moveBallTo(parallelHoleId, P2_MAIN_HOLE_KEY);
+                                        }
+                                        // move the last ball from the last hole to player 1 hole
+                                        moveBallTo(lastHole, P2_MAIN_HOLE_KEY);
+
+                                        //update parallelHole and lastHole hole score
+                                        updateScore(parallelHoleId, true);
+                                        updateScore(this.lastHole, true);
+                                    }
+                                }
+
+                                // If all player1 holes are empty, player2 get another turn in order to finish the game
+                                // If the ball end in an empty hole of player 2, player 1 should get the next turn
+                                changeTurn(!isAllPlayerHolesEmpty(true));
+
+                            } else
+                                changeTurn(!gameTurn);
                         }
-                        else
-                            changeTurn(!gameTurn);
                     }
+
+                    // turn off the highlight of the hole
+                    highlightHole(holeKey, Color.WHEAT, false);
+
+                    //update the hole score
+                    setBallAmountToHole(holeKey, (short) 0, true, false);
+
+                    canPlay = true;
                 }
-
-                // turn off the highlight of the hole
-                highlightHole(holeKey, Color.WHEAT, false);
-
-                //update the hole score
-                setBallAmountToHole(holeKey, (short)0, true, false);
-
-                canPlay = true;
-            }
-            // CPU action (if the CPU turn and not PVP mode)
-            if((GAME_TYPE == PVC && !gameTurn) || GAME_TYPE == CVC)
-            {
-                CPUAction(gameTurn);
+                // CPU action (if the CPU turn and not PVP mode)
+                if ((GAME_TYPE == PVC && !gameTurn) || GAME_TYPE == CVC) {
+                    CPUAction(gameTurn);
+                }
             }
         }
-        else {
-            logAction("canPlay variable is: " + canPlay + "isGameOver variable is: "+ isGameOver+".", 2);
-        }
+        else{
+                logAction("canPlay variable is: " + canPlay + "isGameOver variable is: " + isGameOver + ".", 2);
+            }
     }
 
 
@@ -649,6 +653,28 @@ public class GameController extends General implements Initializable {
     protected void start_new_game() throws Exception{
         startPVP(new Stage());
     }
+
+    @FXML
+    protected void pausePlay(){
+        if(pause) {
+            pausePlay.setId("pause");
+            pause = false;
+            if (waitingQueue != -2)
+            {
+                selectHole(waitingQueue);
+                waitingQueue = -2;
+            }
+            else if(GAME_TYPE == CVC){
+                CPUAction(gameTurn);
+            }
+        }
+        else {
+            pausePlay.setId("play");
+            pause = true;
+        }
+
+    }
+
 
 
     // this function get the amount of balls in each hole and the CPU player (P1 = ture, P2 = false)
