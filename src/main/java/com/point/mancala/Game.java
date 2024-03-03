@@ -20,6 +20,7 @@ public class Game extends Application {
     public void start(Stage primaryStage) throws Exception {
         FXMLLoader fxmlLoader = new FXMLLoader(Game.class.getResource("game.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
+        primaryStage.setResizable(false);
         primaryStage.setTitle("PVP Game");
         primaryStage.setScene(scene);
         primaryStage.show();

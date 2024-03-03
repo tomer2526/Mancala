@@ -174,8 +174,10 @@ public class GameController extends General implements Initializable {
 
         // CPU action (if the CPU turn and not PVP mode)
         if (GAME_TYPE == CVC) {
-            pausePlay.setVisible(true);
             CPUAction(gameTurn);
+        }
+        else {
+            pausePlay.setVisible(false);
         }
     }
 
