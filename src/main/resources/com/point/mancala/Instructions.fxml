@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.effect.InnerShadow?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.text.Font?>
+
+<VBox id="main_layout" alignment="TOP_CENTER" prefHeight="403.0" prefWidth="600.0" spacing="30.0" stylesheets="@../../../css/style.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.point.mancala.MainController">
+   <children>
+       <VBox id="tittle_layout" fx:id="tittle_layout" alignment="CENTER" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="68.0" prefWidth="600.0" stylesheets="@../../../css/style.css">
+           <Label fx:id="tittle_text" rotate="-2.0" text="Instructions" textFill="#402601c2">
+               <font>
+                   <Font name="Coda ExtraBold" size="30.0" />
+               </font>
+               <effect>
+                   <InnerShadow blurType="GAUSSIAN" height="25.24" offsetY="4.0" radius="5.81" width="0.0">
+                       <color>
+                           <Color opacity="0.2997131943702698" />
+                       </color>
+                   </InnerShadow>
+               </effect>
+           </Label>
+       </VBox>
+       <VBox fx:id="buttons_layout" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="50.0">
+         <children>
+            <Label alignment="CENTER" contentDisplay="CENTER" minWidth="-Infinity" text="1" textFill="#402601">
+               <font>
+                  <Font name="Coda ExtraBold" size="20.0" />
+               </font>
+            </Label>
+         </children>
+         <padding>
+            <Insets left="20.0" right="20.0" />
+         </padding>
+       </VBox>
+   </children>
+</VBox>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.effect.InnerShadow?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.text.Font?>
+
+<VBox id="main_layout" alignment="TOP_CENTER" prefHeight="400.0" prefWidth="600.0" spacing="20.0" stylesheets="@../../../css/style.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.point.mancala.playerVsCpuMenuController">
+   <children>
+       <VBox id="tittle_layout" fx:id="tittle_layout" alignment="CENTER" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="68.0" prefWidth="600.0" stylesheets="@../../../css/style.css">
+           <Label fx:id="tittle_text" rotate="-2.0" text="Mancala" textFill="#402601c2">
+               <font>
+                   <Font name="Coda ExtraBold" size="30.0" />
+               </font>
+               <effect>
+                   <InnerShadow blurType="GAUSSIAN" height="25.24" offsetY="4.0" radius="5.81" width="0.0">
+                       <color>
+                           <Color opacity="0.2997131943702698" />
+                       </color>
+                   </InnerShadow>
+               </effect>
+           </Label>
+       </VBox>
+      <VBox alignment="TOP_CENTER">
+         <children>
+            <Label fx:id="tittle_text1" text="Choose a difficulty level" textAlignment="CENTER" textFill="#402601c2">
+               <font>
+                  <Font name="Coda ExtraBold" size="25.0" />
+               </font>
+               <effect>
+                  <InnerShadow blurType="GAUSSIAN" height="25.24" offsetY="4.0" radius="5.81" width="0.0">
+                     <color>
+                        <Color opacity="0.2997131943702698" />
+                     </color>
+                  </InnerShadow>
+               </effect>
+            </Label>
+            <Separator prefWidth="200.0" />
+         </children>
+      </VBox>
+      <VBox alignment="TOP_CENTER" prefHeight="219.0" prefWidth="467.0" spacing="20.0">
+         <children>
+             <VBox fx:id="buttons_layout" alignment="CENTER" maxWidth="-Infinity" prefHeight="200.0" spacing="30.0">
+                 <Button id="button" fx:id="b1" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#towPlayerModeClick" prefHeight="53.0" prefWidth="300.0" stylesheets="@../../../css/style.css" text="Eazy" textAlignment="CENTER">
+                     <font>
+                         <Font name="Coda ExtraBold" size="24.0" />
+                     </font>
+                  <effect>
+                     <DropShadow offsetY="3.0" spread="0.2">
+                        <color>
+                           <Color red="0.3799999952316284" green="0.22166666388511658" opacity="0.485659658908844" />
+                        </color>
+                        <input>
+                           <InnerShadow choke="0.2" offsetY="-2.0">
+                              <color>
+                                 <Color opacity="0.25" />
+                              </color>
+                           </InnerShadow>
+                        </input>
+                     </DropShadow>
+                  </effect>
+                 </Button>
+                 <Button id="button" fx:id="b2" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Normal" textAlignment="CENTER">
+                     <font>
+                         <Font name="Coda ExtraBold" size="24.0" />
+                     </font>
+                 </Button>
+                 <Button id="button" fx:id="b3" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Hard" textAlignment="CENTER">
+                     <font>
+                         <Font name="Coda ExtraBold" size="24.0" />
+                     </font>
+                 </Button>
+             </VBox>
+         </children>
+      </VBox>
+   </children>
+</VBox>
