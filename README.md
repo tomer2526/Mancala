@@ -54,5 +54,3 @@
 מעבד: 1M
 סביבת עבודה: macOS 14
 תוכנה: IntelliJ IDEA
-
-![image](https://github.com/tomer2526/Mancala/assets/32513840/f318fb3c-20e1-44f2-b1a7-09fbe59231ed)
