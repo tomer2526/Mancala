@@ -250,7 +250,7 @@ public class GameController extends General implements Initializable {
                             // player 1 get another turn
                             bonus_turn_sound();
                             Animations sa = new Animations();
-                            sa.scale(game_turn_label, 300, 1.1, false);
+                            sa.scale(game_turn_label, 300, 1.1, 2);
                         }
                     } else {
                         if (!gameTurn && (this.lastHole == P2_MAIN_HOLE_KEY)) {
@@ -260,7 +260,7 @@ public class GameController extends General implements Initializable {
                                 // Player 2 get another turn
                                 bonus_turn_sound();
                                 Animations sa = new Animations();
-                                sa.scale(game_turn_label, 300, 1.1, false);
+                                sa.scale(game_turn_label, 300, 1.1, 2);
                             }
                         } else {
                             int lastHoleBallCount = getHoleBallCount(this.lastHole);
@@ -657,7 +657,7 @@ public class GameController extends General implements Initializable {
         win_window.setVisible(true);
 
         Animations pop = new Animations();
-        pop.scale(win_window, 500, 0.5, false);
+        pop.scale(win_window, 500, 0.5, 2);
 
        //pop.rotate(win_window, 500,false);
 
@@ -711,6 +711,14 @@ public class GameController extends General implements Initializable {
             gameSound = true;
         }
 
+    }
+    @FXML
+    protected void hole_in(MouseEvent mouseEvent){
+        animation.scale(((AnchorPane)mouseEvent.getSource()).getChildren().getLast(), 150, -0.1, 1);
+    }
+    @FXML
+    protected void hole_out(MouseEvent mouseEvent){
+        animation.scale(((AnchorPane)mouseEvent.getSource()).getChildren().getLast(), 150, 0.1, 1);
     }
 
 

@@ -187,7 +187,7 @@
                         <VBox maxWidth="-Infinity" minHeight="5.0" prefHeight="5.0" prefWidth="100.0" />
                         <HBox fx:id="holes_row1" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="100.0" prefWidth="200.0" spacing="20.0">
                            <children>
-                              <AnchorPane fx:id="hole0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#holeClick" onMouseEntered="#holeMouseHover" onMouseExited="#holeMouseNotHover" prefHeight="120.0" prefWidth="120.0">
+                              <AnchorPane fx:id="hole0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#holeClick" onMouseEntered="#holeMouseHover" onMouseExited="#holeMouseNotHover" onMousePressed="#hole_in" onMouseReleased="#hole_out" prefHeight="120.0" prefWidth="120.0">
                                  <children>
                                     <Rectangle fx:id="hole_style" arcHeight="150.0" arcWidth="150.0" fill="#fcbc6a" height="120.0" stroke="#8d6922" strokeLineJoin="BEVEL" strokeType="INSIDE" strokeWidth="0.0" width="120.0">
                                        <effect>
@@ -240,7 +240,7 @@
                                     </GridPane>
                                  </children>
                               </AnchorPane>
-                              <AnchorPane fx:id="hole1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#holeClick" onMouseEntered="#holeMouseHover" onMouseExited="#holeMouseNotHover" prefHeight="120.0" prefWidth="120.0">
+                              <AnchorPane fx:id="hole1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#holeClick" onMouseEntered="#holeMouseHover" onMouseExited="#holeMouseNotHover" onMousePressed="#hole_in" onMouseReleased="#hole_out" prefHeight="120.0" prefWidth="120.0">
                                  <children>
                                     <Rectangle fx:id="hole_style1" arcHeight="150.0" arcWidth="150.0" fill="#fcbc6a" height="120.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="120.0">
                                        <effect>
@@ -293,7 +293,7 @@
                                     </GridPane>
                                  </children>
                               </AnchorPane>
-                              <AnchorPane fx:id="hole2" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#holeClick" onMouseEntered="#holeMouseHover" onMouseExited="#holeMouseNotHover" prefHeight="120.0" prefWidth="120.0">
+                              <AnchorPane fx:id="hole2" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#holeClick" onMouseEntered="#holeMouseHover" onMouseExited="#holeMouseNotHover" onMousePressed="#hole_in" onMouseReleased="#hole_out" prefHeight="120.0" prefWidth="120.0">
                                  <children>
                                     <Rectangle arcHeight="150.0" arcWidth="150.0" fill="#fcbc6a" height="120.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="120.0">
                                        <effect>
@@ -346,7 +346,7 @@
                                     </GridPane>
                                  </children>
                               </AnchorPane>
-                              <AnchorPane fx:id="hole3" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#holeClick" onMouseEntered="#holeMouseHover" onMouseExited="#holeMouseNotHover" prefHeight="120.0" prefWidth="120.0">
+                              <AnchorPane fx:id="hole3" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#holeClick" onMouseEntered="#holeMouseHover" onMouseExited="#holeMouseNotHover" onMousePressed="#hole_in" onMouseReleased="#hole_out" prefHeight="120.0" prefWidth="120.0">
                                  <children>
                                     <Rectangle fx:id="hole_style12" arcHeight="150.0" arcWidth="150.0" fill="#fcbc6a" height="120.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="120.0">
                                        <effect>
@@ -399,7 +399,7 @@
                                     </GridPane>
                                  </children>
                               </AnchorPane>
-                              <AnchorPane fx:id="hole4" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#holeClick" onMouseEntered="#holeMouseHover" onMouseExited="#holeMouseNotHover" prefHeight="120.0" prefWidth="120.0">
+                              <AnchorPane fx:id="hole4" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#holeClick" onMouseEntered="#holeMouseHover" onMouseExited="#holeMouseNotHover" onMousePressed="#hole_in" onMouseReleased="#hole_out" prefHeight="120.0" prefWidth="120.0">
                                  <children>
                                     <Rectangle fx:id="hole_style13" arcHeight="150.0" arcWidth="150.0" fill="#fcbc6a" height="120.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="120.0">
                                        <effect>
@@ -452,7 +452,7 @@
                                     </GridPane>
                                  </children>
                               </AnchorPane>
-                              <AnchorPane fx:id="hole5" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#holeClick" onMouseEntered="#holeMouseHover" onMouseExited="#holeMouseNotHover" prefHeight="120.0" prefWidth="120.0">
+                              <AnchorPane fx:id="hole5" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#holeClick" onMouseEntered="#holeMouseHover" onMouseExited="#holeMouseNotHover" onMousePressed="#hole_in" onMouseReleased="#hole_out" prefHeight="120.0" prefWidth="120.0">
                                  <children>
                                     <Rectangle fx:id="hole_style14" arcHeight="150.0" arcWidth="150.0" fill="#fcbc6a" height="120.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="120.0">
                                        <effect>
@@ -509,7 +509,7 @@
                         </HBox>
                         <HBox fx:id="holes_row2" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="100.0" prefWidth="200.0" spacing="20.0">
                            <children>
-                              <AnchorPane fx:id="hole6" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#holeClick" onMouseEntered="#holeMouseHover" onMouseExited="#holeMouseNotHover" prefHeight="120.0" prefWidth="120.0">
+                              <AnchorPane fx:id="hole6" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#holeClick" onMouseEntered="#holeMouseHover" onMouseExited="#holeMouseNotHover" onMousePressed="#hole_in" onMouseReleased="#hole_out" prefHeight="120.0" prefWidth="120.0">
                                  <children>
                                     <Rectangle fx:id="hole_style6" arcHeight="150.0" arcWidth="150.0" fill="#fcbc6a" height="120.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="120.0">
                                        <effect>
@@ -562,7 +562,7 @@
                                     </GridPane>
                                  </children>
                               </AnchorPane>
-                              <AnchorPane fx:id="hole7" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#holeClick" onMouseEntered="#holeMouseHover" onMouseExited="#holeMouseNotHover" prefHeight="120.0" prefWidth="120.0">
+                              <AnchorPane fx:id="hole7" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#holeClick" onMouseEntered="#holeMouseHover" onMouseExited="#holeMouseNotHover" onMousePressed="#hole_in" onMouseReleased="#hole_out" prefHeight="120.0" prefWidth="120.0">
                                  <children>
                                     <Rectangle fx:id="hole_style16" arcHeight="150.0" arcWidth="150.0" fill="#fcbc6a" height="120.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="120.0">
                                        <effect>
@@ -615,7 +615,7 @@
                                     </GridPane>
                                  </children>
                               </AnchorPane>
-                              <AnchorPane fx:id="hole8" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#holeClick" onMouseEntered="#holeMouseHover" onMouseExited="#holeMouseNotHover" prefHeight="120.0" prefWidth="120.0">
+                              <AnchorPane fx:id="hole8" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#holeClick" onMouseEntered="#holeMouseHover" onMouseExited="#holeMouseNotHover" onMousePressed="#hole_in" onMouseReleased="#hole_out" prefHeight="120.0" prefWidth="120.0">
                                  <children>
                                     <Rectangle fx:id="hole_style161" arcHeight="150.0" arcWidth="150.0" fill="#fcbc6a" height="120.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="120.0">
                                        <effect>
@@ -668,7 +668,7 @@
                                     </GridPane>
                                  </children>
                               </AnchorPane>
-                              <AnchorPane fx:id="hole9" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#holeClick" onMouseEntered="#holeMouseHover" onMouseExited="#holeMouseNotHover" prefHeight="120.0" prefWidth="120.0">
+                              <AnchorPane fx:id="hole9" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#holeClick" onMouseEntered="#holeMouseHover" onMouseExited="#holeMouseNotHover" onMousePressed="#hole_in" onMouseReleased="#hole_out" prefHeight="120.0" prefWidth="120.0">
                                  <children>
                                     <Rectangle fx:id="hole_style162" arcHeight="150.0" arcWidth="150.0" fill="#fcbc6a" height="120.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="120.0">
                                        <effect>
@@ -721,7 +721,7 @@
                                     </GridPane>
                                  </children>
                               </AnchorPane>
-                              <AnchorPane fx:id="hole10" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#holeClick" onMouseEntered="#holeMouseHover" onMouseExited="#holeMouseNotHover" prefHeight="120.0" prefWidth="120.0">
+                              <AnchorPane fx:id="hole10" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#holeClick" onMouseEntered="#holeMouseHover" onMouseExited="#holeMouseNotHover" onMousePressed="#hole_in" onMouseReleased="#hole_out" prefHeight="120.0" prefWidth="120.0">
                                  <children>
                                     <Rectangle fx:id="hole_style163" arcHeight="150.0" arcWidth="150.0" fill="#fcbc6a" height="120.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="120.0">
                                        <effect>
@@ -774,7 +774,7 @@
                                     </GridPane>
                                  </children>
                               </AnchorPane>
-                              <AnchorPane fx:id="hole11" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#holeClick" onMouseEntered="#holeMouseHover" onMouseExited="#holeMouseNotHover" prefHeight="120.0" prefWidth="120.0">
+                              <AnchorPane fx:id="hole11" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#holeClick" onMouseEntered="#holeMouseHover" onMouseExited="#holeMouseNotHover" onMousePressed="#hole_in" onMouseReleased="#hole_out" prefHeight="120.0" prefWidth="120.0">
                                  <children>
                                     <Rectangle fx:id="hole_style1631" arcHeight="150.0" arcWidth="150.0" fill="#fcbc6a" height="120.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="120.0">
                                        <effect>
