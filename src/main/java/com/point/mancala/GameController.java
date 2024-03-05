@@ -1,5 +1,9 @@
 package com.point.mancala;
 
+import com.point.mancala.Animations.Animations;
+import com.point.mancala.Animations.FadeAnimation;
+import com.point.mancala.Animations.Scale;
+import com.point.mancala.Animations.Translate;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.collections.ObservableList;
@@ -34,7 +38,6 @@ public class GameController extends General implements Initializable {
     private static  final char GRID_COLUMNS_NUM = 4; // nums of columns for each grid hols (except the player main hole grid) - min 2 columns
     protected int[][] gridArr = {{2,1},{2,2},{1,2},{1,1}, {1,0}, {2,0}, {3,0},{3, 1}, {3, 2}, {3, 3}, {2, 3}, {1, 3}, {0,3},{0, 2}, {0, 1}, {0,0}}; // this arr store the location of each of the ball in the grid, for example, the first ball should be located in 1,1 (in the center of the grid)
     private final Animations animation = new Animations();
-    private final Animations playerSwing = new Animations();
     protected AnchorPane[] holes;
     protected boolean canPlay = true; // Indicate if any player can play, when loading time is over it will be trues
     protected boolean isGameOver = false; // if a player win this var will be true;
@@ -174,7 +177,7 @@ public class GameController extends General implements Initializable {
 
         // CPU action (if the CPU turn and not PVP mode)
         if (GAME_TYPE == CVC) {
-            CPUAction(gameTurn);
+            CPUAction(gameTurn, true);
         }
         else {
             pausePlay.setVisible(false);
@@ -249,8 +252,7 @@ public class GameController extends General implements Initializable {
                         } else {
                             // player 1 get another turn
                             bonus_turn_sound();
-                            Animations sa = new Animations();
-                            sa.scale(game_turn_label, 300, 1.1, 2);
+                            new Scale().scale(game_turn_label, 300, 1.1, 2);
                         }
                     } else {
                         if (!gameTurn && (this.lastHole == P2_MAIN_HOLE_KEY)) {
@@ -259,8 +261,7 @@ public class GameController extends General implements Initializable {
                             } else {
                                 // Player 2 get another turn
                                 bonus_turn_sound();
-                                Animations sa = new Animations();
-                                sa.scale(game_turn_label, 300, 1.1, 2);
+                                new Scale().scale(game_turn_label, 300, 1.1, 2);
                             }
                         } else {
                             int lastHoleBallCount = getHoleBallCount(this.lastHole);
@@ -355,7 +356,7 @@ public class GameController extends General implements Initializable {
                 }
                 // CPU action (if the CPU turn and not PVP mode)
                 if ((GAME_TYPE == PVC && !gameTurn) || GAME_TYPE == CVC) {
-                    CPUAction(gameTurn);
+                    CPUAction(gameTurn, true);
                 }
             }
         }
@@ -473,7 +474,7 @@ public class GameController extends General implements Initializable {
             else {
                 game_turn_label.setText("Player 1 turn");
                 //playerSwing.translate(player1_name);
-                playerSwing.fadeAnimation(player1_name, 300, false);
+                new FadeAnimation().fadeAnimation(player1_name, 300, false);
             }
         }
         else {
@@ -487,10 +488,10 @@ public class GameController extends General implements Initializable {
             else {
                 game_turn_label.setText("Player 2 turn");
                 //playerSwing.translate(player2_name);
-                playerSwing.fadeAnimation(player2_name, 300, false);
+                new FadeAnimation().fadeAnimation(player2_name, 300, false);
             }
         }
-        animation.fadeAnimation(game_turn_label, 300, false);
+        new FadeAnimation().fadeAnimation(game_turn_label, 300, false);
     }
 
     // return true if all the player's hols are empty
@@ -561,12 +562,22 @@ public class GameController extends General implements Initializable {
 
             // Move the ball to the destination
             addBallToGrid(destGrid, ball, destBallCount);
+
             // Update the balls amount on the source
             setBallAmountToHole(source, (short)(sourceBallCount-1), true, false);
+
 
             // Update the destination hole score
             destBallCount++;
             setBallAmountToHole(dest, destBallCount,true, false);
+
+            // Make pop animation
+            Scale scale = new Scale();
+            scale.scale(ball, 150, -0.1, 1);
+            Timeline timeline = new Timeline(new KeyFrame(Duration.millis(150), e -> {
+                scale.scale(ball, 150, 0.1, 1);
+            }));
+            timeline.play();
         }
         else {
            logAction("There is no balls in source!", 1);
@@ -615,8 +626,7 @@ public class GameController extends General implements Initializable {
 
         if(withAnimation)
         {
-            Animations fa = new Animations();
-            fa.fadeAnimation(hole_score, 300, false);
+            new FadeAnimation().fadeAnimation(hole_score, 300, false);
         }
     }
 
@@ -635,7 +645,7 @@ public class GameController extends General implements Initializable {
         else if(is_player1_win) {
             winner_player.setText("Player 1 win!");
             //swing the winner name
-            Animations swing = new Animations();
+            Translate swing = new Translate();
             try {
                 swing.translate(player1_name);
             } catch (IOException e) {
@@ -646,18 +656,16 @@ public class GameController extends General implements Initializable {
         {
             winner_player.setText("Player 2 win!");
             //swing the winner name
-            Animations swing = new Animations();
+
             try {
-                swing.translate(player2_name);
+                 new Translate().translate(player2_name);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
 
         win_window.setVisible(true);
-
-        Animations pop = new Animations();
-        pop.scale(win_window, 500, 0.5, 2);
+        new Scale().scale(win_window, 500, 0.5, 2);
 
        //pop.rotate(win_window, 500,false);
 
@@ -692,7 +700,7 @@ public class GameController extends General implements Initializable {
                 waitingQueue = -2;
             }
             else if(GAME_TYPE == CVC){
-                CPUAction(gameTurn);
+                CPUAction(gameTurn, true);
             }
         }
         else {
@@ -714,38 +722,75 @@ public class GameController extends General implements Initializable {
     }
     @FXML
     protected void hole_in(MouseEvent mouseEvent){
-        animation.scale(((AnchorPane)mouseEvent.getSource()).getChildren().getLast(), 150, -0.1, 1);
+        if(mouseEvent.getSource() instanceof Pane)
+            new Scale().scale(((Pane)mouseEvent.getSource()).getChildren().getLast(), 150, -0.1, 1);
+        else {
+            new Scale().scale((Node) mouseEvent.getSource(), 150, -0.1, 1);
+        }
     }
     @FXML
     protected void hole_out(MouseEvent mouseEvent){
-        animation.scale(((AnchorPane)mouseEvent.getSource()).getChildren().getLast(), 150, 0.1, 1);
+        if(mouseEvent.getSource() instanceof Pane)
+            new Scale().scale(((Pane)mouseEvent.getSource()).getChildren().getLast(), 150, 0.1, 1);
+        else
+            new Scale().scale((Node)mouseEvent.getSource(), 150, 0.1, 1);
     }
 
 
+    // Highlight the hole the CPU would choose
+    @FXML
+    protected void cpuHint(){
+        if(GAME_TYPE != CVC)
+            CPUAction(gameTurn, false);
+    }
 
 
     // this function get the amount of balls in each hole and the CPU player (P1 = ture, P2 = false)
     // and return the hole index to be clicked.
-    public void CPUAction(boolean CPU_player)  {
+    // if select set to true the hole will be selected, if false, the hole will only be highlighted
+    public void CPUAction(boolean CPU_player, boolean select)  {
 
         if(!isGameOver) {
             logAction("Wait for CPU action");
 
             //list with 2 parameters - index 0 = the start holeKey of the player and index 1 = the last holeKey of the player.
             short[] holesRange = CPU_player ? P1_holesRange : P2_holesRange;
-            short holeKey = getMaxBallsHole(CPU_player, holesRange);
+
+            short holeKey = bestHoleToGetAnotherTurn(CPU_player, holesRange);
+            if(holeKey == -1)
+            {
+                holeKey = getMaxBallsHole(CPU_player, holesRange);
+            }
+
+
+            GridPane holeGrid = getGridFromHoleKey(holeKey);
 
             logAction("CPU choice: " + holeKey);
             highlightHole(holeKey, Color.RED, true);
+            hover_sound();
+            if(select) {
+                // Set delay for select
+                short finalHoleKey = holeKey;
 
-            // Set delay for select
-            short finalHoleKey = holeKey;
-            Timeline timeline = new Timeline(new KeyFrame(dellay, e -> {
-                // Code that interacts with UI elements
-                logAction("Delay done, now select the hole: " + finalHoleKey);
-                selectHole(finalHoleKey);
-            }));
-            timeline.play();
+                Timeline timeline = new Timeline(new KeyFrame(dellay, e -> {
+                    // Code that interacts with UI elements
+                    logAction("Delay done, now select the hole: " + finalHoleKey);
+
+                    new Scale().scale(holeGrid, 150, -0.1, 1);
+                    Timeline animationDelay = new Timeline(new KeyFrame(Duration.millis(150), event -> {
+                        new Scale().scale(holeGrid, 1, 0.1, 1);
+
+                        // Select the hole
+                        selectHole(finalHoleKey);
+                    }));
+                    animationDelay.play();
+                }));
+                timeline.play();
+            }
+            else {
+                    // Code that interacts with UI elements
+                new Scale().scale(holeGrid, 300, 0.15, 2);
+            }
         }
     }
 
@@ -760,10 +805,65 @@ public class GameController extends General implements Initializable {
         return 0;
     }
 
+
     // This function returns the holeKey that can give you another turn
+    // -1 = hole not found.
     public short bestHoleToGetAnotherTurn(boolean player, short[] holesRange)  {
-        return 0;
+        short holeKey = -1;
+        short ballCount;
+        if(player)
+        {
+            for (short key = holesRange[0]; key <= holesRange[1]; key++)
+            {
+                ballCount = getHoleBallCount(key);
+                if(ballCount > 0 && (key - ballCount == -1 || key -ballCount == 0))
+                {
+                    holeKey = key;
+                    break;
+                }
+            }
+        }
+        else {
+            for (short key = holesRange[0]; key <= holesRange[1]; key++)
+            {
+                ballCount = getHoleBallCount(key);
+                if(ballCount > 0 && (key + getHoleBallCount(key) == 12 || key + getHoleBallCount(key) == 11))
+                {
+                    holeKey = key;
+                    break;
+                }
+            }
+        }
+        return holeKey;
     }
+
+//    // This function returns the holeKey that can give you another turn in the next turn
+//    // -1 = hole not found.
+//    public short bestHoleToGetAnotherTurnNext(boolean player, short[] holesRange)  {
+//        short holeKey = -1;
+//        if(player)
+//        {
+//            for (short key = holesRange[0]; key <= holesRange[1]; key++)
+//            {
+//                if(key - getHoleBallCount(key) == 0)
+//                {
+//                    holeKey = key;
+//                    break;
+//                }
+//            }
+//        }
+//        else {
+//            for (short key = holesRange[0]; key <= holesRange[1]; key++)
+//            {
+//                if(key + getHoleBallCount(key) == 11)
+//                {
+//                    holeKey = key;
+//                    break;
+//                }
+//            }
+//        }
+//        return holeKey;
+//    }
 
     // This function returns the holeKey with the most balls
     public short getMaxBallsHole(boolean player, short[] holesRange)  {

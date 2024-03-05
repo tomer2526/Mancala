@@ -23,7 +23,7 @@
          <children>
             <BorderPane fx:id="tittle_layout" maxWidth="1.7976931348623157E308" prefWidth="200.0">
                <center>
-                  <Label fx:id="tittle_text" minWidth="-Infinity" prefHeight="48.0" rotate="-2.0" text="Mancala" textFill="#402601c2" BorderPane.alignment="CENTER">
+                  <Label fx:id="tittle_text" minWidth="-Infinity" onMouseClicked="#cpuHint" onMousePressed="#hole_in" onMouseReleased="#hole_out" prefHeight="48.0" rotate="-2.0" text="Mancala" textFill="#402601c2" BorderPane.alignment="CENTER">
                      <font>
                         <Font name="Coda ExtraBold" size="30.0" />
                      </font>

@@ -1,6 +1,7 @@
 package com.point.mancala;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import java.io.IOException;
@@ -18,7 +19,7 @@ public class General extends UIUX {
     protected static final List<Color> COLORS = List.of(Color.GREEN, Color.RED, Color.BLUE, Color.ORANGE);
     //ArrayList<Short> holesBallsCount = new ArrayList<Short>(12); // a list that contain the amount of balls in each hole (include the mains)
     HashMap<Short, ArrayList<Object>> HOLES = new HashMap<>(14); // hasMap that contain the index of the hole in the key and a list of the hole data
-    //example: holeIndex: {(the amount of balls), (gridHole object), (AnchorPane object) (Rectangle shape) (ball count label object) }
+    //example: holeIndex: {(the amount of balls), (gridHole object), (AnchorPane object) (Rectangle shape) (ball count label object), (GridPane grid) }
     // index -1 = P1 main hole, 12 = P2 main hole
     protected final short P1_MAIN_HOLE_KEY = -1;
     protected final short P2_MAIN_HOLE_KEY = 12;
@@ -58,6 +59,9 @@ public class General extends UIUX {
     {
         //return hole.getChildren().size() - BALLS_START_INDEX;
         return (short) HOLES.get(holeKey).getFirst(); // BALLS_COUNT_INDEX -> firstIndex
+    }
+    protected GridPane getGridFromHoleKey(short holeKey){
+            return (GridPane) HOLES.get(holeKey).get(1);
     }
 
 
