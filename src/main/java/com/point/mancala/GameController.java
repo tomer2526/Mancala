@@ -745,9 +745,10 @@ public class GameController extends General implements Initializable {
     }
 
 
-    // this function get the amount of balls in each hole and the CPU player (P1 = ture, P2 = false)
-    // and return the hole index to be clicked.
-    // if select set to true the hole will be selected, if false, the hole will only be highlighted
+    /** this function get the amount of balls in each hole and the CPU player (P1 = ture, P2 = false)
+        * and return the hole index to be clicked.
+        * if select set to true the hole will be selected, if false, the hole will only be highlighted
+     **/
     public void CPUAction(boolean CPU_player, boolean select)  {
 
         if(!isGameOver) {
@@ -756,10 +757,18 @@ public class GameController extends General implements Initializable {
             //list with 2 parameters - index 0 = the start holeKey of the player and index 1 = the last holeKey of the player.
             short[] holesRange = CPU_player ? P1_holesRange : P2_holesRange;
 
-            short holeKey = bestHoleToGetAnotherTurn(CPU_player, holesRange);
+
+            short holeKey = bestHoleForParallelRol(CPU_player, holesRange);
+            logAction("bestHoleForParallelRol: "+ holeKey);
+
+            if(holeKey == -1){
+                holeKey = bestHoleToGetAnotherTurn(CPU_player, holesRange);
+                logAction("bestHoleToGetAnotherTurn: "+ holeKey);
+            }
             if(holeKey == -1)
             {
                 holeKey = getMaxBallsHole(CPU_player, holesRange);
+                logAction("getMaxBallsHole: "+ holeKey);
             }
 
 
@@ -768,6 +777,7 @@ public class GameController extends General implements Initializable {
             logAction("CPU choice: " + holeKey);
             highlightHole(holeKey, Color.RED, true);
             hover_sound();
+
             if(select) {
                 // Set delay for select
                 short finalHoleKey = holeKey;
@@ -795,14 +805,88 @@ public class GameController extends General implements Initializable {
     }
 
 
+    /** This function returns the holeKey that you can use to apply the law of parallelism
+     * if there is no hole that can applay the rol- return -1
+     **/
+    protected short bestHoleForParallelRol(boolean player, short[] holesRange) {
+        short parallelHoleBallsCount;
+        short maxHoleKey = -1;
+        short maxParallelHoleBalls = 0;
+        short endHole;
 
 
-    // Functions for CPU logic
+        for (short holeKey = holesRange[0]; holeKey <= holesRange[1]; holeKey++) {
+            endHole = getEndHole(holeKey);
+            if (endHole != -2)
+            {
+                parallelHoleBallsCount = getHoleBallCount(getParallelHole(endHole));
+                /** If the parallel hole can be used on the endHole
+                 * if the there is no balls in the end hole and the end hole is of this player and the amount of balls in the parallel hole if more then 0
+                 * the parallel law can be used
+                 * */
+                logAction("get parallel hole for: " + holeKey + "if: " + (endHole != -1 && endHole != 12 && getHoleBallCount(endHole) == 0 && (PlayerOfHoleKey(endHole) == player) && parallelHoleBallsCount > 0), 2);
+                if (endHole != -1 && endHole != 12 && getHoleBallCount(endHole) == 0 && (PlayerOfHoleKey(endHole) == player) && parallelHoleBallsCount > 0) {
+                    if (maxParallelHoleBalls < parallelHoleBallsCount) {
+                        maxParallelHoleBalls = parallelHoleBallsCount;
+                        maxHoleKey = holeKey;
+                    }
+                }
+            }
+    }
+        return maxHoleKey;
 
-    // This function returns the holeKey that you can use to apply the law of parallelism
-    public short bestHoleForParallelLaw(boolean player, short[] holesRange)  {
+    }
 
-        return 0;
+    /**
+     * This function return true if the provided holeKey is one of the Player1 hols and false if one of the Player2 holes
+    **/
+    protected boolean PlayerOfHoleKey(short holeKey){
+        return (holeKey >= P1_holesRange[0]-1) && (holeKey <= P1_holesRange[1]);
+    }
+
+    /**
+     * This function return the parallel hole for the given holeKey
+     **/
+    protected short getParallelHole(short holeKey){
+        if(PlayerOfHoleKey(holeKey)){
+            return (short) (holeKey+6);
+        }
+        else
+            return (short) (holeKey-6);
+    }
+
+
+    /** This function returns the holeKey that the last ball of the provided holeKey will end
+     * if there is no balls on the provided hole it will return -2.
+     **/
+    public short getEndHole(short holeKey) {
+        short ballCount = getHoleBallCount(holeKey);
+        if (ballCount == 0)
+            return -2;
+        else {
+            short endHoleKey = holeKey;
+//        logAction("*******************");
+//        logAction("for: "+ holeKey);
+
+            while (ballCount > 0) {
+                if (PlayerOfHoleKey(endHoleKey)) {
+                    if (endHoleKey == -1)
+                        endHoleKey = 6;
+                    else
+                        endHoleKey--;
+                    //logAction(endHoleKey + "++++");
+                } else {
+                    if (endHoleKey == 12)
+                        endHoleKey = 5;
+                    else
+                        endHoleKey++;
+                    //logAction(endHoleKey + "-----");
+                }
+                ballCount--;
+            }
+            //logAction(endHoleKey);
+            return endHoleKey;
+        }
     }
 
 
@@ -836,34 +920,6 @@ public class GameController extends General implements Initializable {
         }
         return holeKey;
     }
-
-//    // This function returns the holeKey that can give you another turn in the next turn
-//    // -1 = hole not found.
-//    public short bestHoleToGetAnotherTurnNext(boolean player, short[] holesRange)  {
-//        short holeKey = -1;
-//        if(player)
-//        {
-//            for (short key = holesRange[0]; key <= holesRange[1]; key++)
-//            {
-//                if(key - getHoleBallCount(key) == 0)
-//                {
-//                    holeKey = key;
-//                    break;
-//                }
-//            }
-//        }
-//        else {
-//            for (short key = holesRange[0]; key <= holesRange[1]; key++)
-//            {
-//                if(key + getHoleBallCount(key) == 11)
-//                {
-//                    holeKey = key;
-//                    break;
-//                }
-//            }
-//        }
-//        return holeKey;
-//    }
 
     // This function returns the holeKey with the most balls
     public short getMaxBallsHole(boolean player, short[] holesRange)  {
