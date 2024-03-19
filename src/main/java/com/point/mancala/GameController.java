@@ -1,6 +1,5 @@
 package com.point.mancala;
 
-import com.point.mancala.Animations.Animations;
 import com.point.mancala.Animations.FadeAnimation;
 import com.point.mancala.Animations.Scale;
 import com.point.mancala.Animations.Translate;
@@ -20,15 +19,14 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 
-import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
+import static com.point.mancala.AlgorithmType.*;
 import static com.point.mancala.GameType.*;
 
-//import static com.point.mancala.Game.startPVP;
 
 public class GameController extends General implements Initializable {
 
@@ -37,15 +35,12 @@ public class GameController extends General implements Initializable {
     private static  final char GRID_ROWS_NUM = 4; // nums of rows for each grid hols (except the player main hole grid) - min 2 rows
     private static  final char GRID_COLUMNS_NUM = 4; // nums of columns for each grid hols (except the player main hole grid) - min 2 columns
     protected int[][] gridArr = {{2,1},{2,2},{1,2},{1,1}, {1,0}, {2,0}, {3,0},{3, 1}, {3, 2}, {3, 3}, {2, 3}, {1, 3}, {0,3},{0, 2}, {0, 1}, {0,0}}; // this arr store the location of each of the ball in the grid, for example, the first ball should be located in 1,1 (in the center of the grid)
-    private final Animations animation = new Animations();
     protected AnchorPane[] holes;
     protected boolean canPlay = true; // Indicate if any player can play, when loading time is over it will be trues
     protected boolean isGameOver = false; // if a player win this var will be true;
     protected boolean pause = false; // if the user pause the game;
-
-    protected static boolean gameTurn = true; // Player 1 turn = true, player 2 false
-    protected short lastHole; // The last hole that a ball got into
-
+    protected boolean gameTurn = true; // Player 1 turn = true, player 2 false
+    protected short lastHoleKey; // The last holeKey that a ball got into
     protected final Duration dellay = Duration.millis(500);
 
     // if the user pause the game and the cpu select hole after the pause, it will get into the waitingQueue
@@ -88,8 +83,6 @@ public class GameController extends General implements Initializable {
     @FXML
     private Button soundToggle;
 
-    public GameController() throws UnsupportedAudioFileException, IOException {
-    }
 
 
     @Override
@@ -108,15 +101,17 @@ public class GameController extends General implements Initializable {
         holes = new AnchorPane[]{(AnchorPane) row1_Children.get(0), (AnchorPane) row1_Children.get(1), (AnchorPane) row1_Children.get(2), (AnchorPane) row1_Children.get(3), (AnchorPane) row1_Children.get(4), (AnchorPane) row1_Children.get(5), (AnchorPane) row2_Children.get(0), (AnchorPane) row2_Children.get(1), (AnchorPane) row2_Children.get(2), (AnchorPane) row2_Children.get(3), (AnchorPane) row2_Children.get(4), (AnchorPane) row2_Children.get(5)};
         game_type.setText(GAME_TYPE_NAME);
 
-        //gridArr = spiralIndoxing();
-
         // create the balls for each hole
         short i;
         Ball b;
 
         // add P1 and P2 main hole to the hashMap
-        HOLES.put((short) -1, new ArrayList<>(List.of((short) 0, ballGridP1, player1_hole, player1_hole.getChildren().getFirst(), p1_score)));
-        HOLES.put((short) 12, new ArrayList<>(List.of((short) 0, ballGridP2, player2_hole, player2_hole.getChildren().getFirst(), p2_score)));
+        P1_MAIN_HOLE = new Hole(P1_MAIN_HOLE_KEY, (short) 0, ballGridP1, player1_hole, (Rectangle)player1_hole.getChildren().getFirst(), p1_score);
+        P2_MAIN_HOLE = new Hole(P2_MAIN_HOLE_KEY, (short) 0, ballGridP2, player2_hole, (Rectangle)player2_hole.getChildren().getFirst(), p2_score);
+
+        HOLES.put(P1_MAIN_HOLE_KEY, P1_MAIN_HOLE);
+        HOLES.put(P2_MAIN_HOLE_KEY, P2_MAIN_HOLE);
+
         GridPane grid;
         Label label;
 
@@ -126,9 +121,9 @@ public class GameController extends General implements Initializable {
                 grid = (GridPane) holeAnchorPane.getChildren().getLast();
                 label = (Label) holeAnchorPane.getChildren().get(1);
 
-                // holeIndex: {(the amount of balls), (gridHole object), (AnchorPane object), (Rectangle shape), (ball count label object) }
-                ArrayList<Object> values = new ArrayList<>(List.of(START_BALL_COUNT, grid, holeAnchorPane, holeAnchorPane.getChildren().getFirst(), label));
-                HOLES.put(holeKey, values);
+
+                Hole hole = new Hole(holeKey, START_BALL_COUNT, grid, holeAnchorPane, (Rectangle)holeAnchorPane.getChildren().getFirst(), label);
+                HOLES.put(holeKey, hole);
 
                 //holesDict.put(holeID, new Hole(grid, START_BALL_COUNT));
                 for (i = 0; i < START_BALL_COUNT; i++) {
@@ -153,12 +148,11 @@ public class GameController extends General implements Initializable {
 
                 short ballsAmount = (short) (insertBalls_holes.contains((int) holeKey) ? 4 : 0);
 
-                // holeIndex: {(the amount of balls), (gridHole object), (AnchorPane object), (Rectangle shape), (ball count label object) }
-                ArrayList<Object> values = new ArrayList<>(List.of(ballsAmount, grid, holeAnchorPane, holeAnchorPane.getChildren().getFirst(), label));
-                HOLES.put(holeKey, values);
+                Hole hole = new Hole(holeKey, ballsAmount, grid, holeAnchorPane, (Rectangle)holeAnchorPane.getChildren().getFirst(), label);
+                HOLES.put(holeKey, hole);
 
                 // update the label score (in UI)
-                updateScore(holeKey, false);
+                hole.updateBallCountLabel(false);
 
                 //holesDict.put(holeID, new Hole(grid, START_BALL_COUNT));
                 for (i = 0; i < ballsAmount; i++) {
@@ -185,15 +179,24 @@ public class GameController extends General implements Initializable {
     }
 
     protected void selectHole(short holeKey) {
+        logAction("log hole 5 amount: " + getHoleBallCount((short) 5));
+        HashMap<Short, Hole> emuHoles = deepCopyHashMap(HOLES);
+        boolean emu_turn = gameTurn;
+        short emuKey = holeKey;
+        Object[] test = emulateSelectHole(emuKey, emuHoles, emu_turn);
+
+       // logAction("**test emu - added score: " + (int)test[0] + " algorithm " + (int)test[1]);
+        logAction("log hole 5 amount: " + getHoleBallCount((short) 5));
 
         if (canPlay || !isGameOver) {
+            Hole hole = HOLES.get(holeKey);
             if (pause) {
                 waitingQueue = holeKey;
             } else {
-                // The first item is - Rectangle hole_style we want just the balls witch is from index 1
-                short ballsCount = getHoleBallCount(holeKey);
+
+                short ballsCount = hole.ballCount;
                 short i;
-                logAction("Hole" + holeKey + " selected", 2);
+                logAction(("Hole" + holeKey + " selected"), 2);
                 boolean canClick; // if the hole can be pressed (if is the player turn)
 
                 // check if is the player turn (if the player's row can be clicked new)
@@ -208,24 +211,29 @@ public class GameController extends General implements Initializable {
 
 
                     canPlay = false;
-                    //move every ball in the hole to the next holes
+                    // move every ball in the hole to the next holes
                     if (holeKey == 0) {
                         nextHoleKey = P1_MAIN_HOLE_KEY; // the next hole after p1 hole
                     } else if (holeKey == 11) {
                         nextHoleKey = P2_MAIN_HOLE_KEY; // the next hole after p2 hole
                     } else {
-                        //if the holeIndex is in row2 we need to move forward (increase the index by 1) in the holes list
+                        // if the holeIndex is in row2 we need to move forward (increase the index by 1) in the holes list
                         if (holeKey >= 6) {
                             nextHoleKey++;
                         } else {
-                            //if the holeIndex is in row1 we need to move backwards (reduce the index by 1) in the holes list
+                            // if the holeIndex is in row1 we need to move backwards (reduce the index by 1) in the holes list
                             nextHoleKey--;
                         }
                     }
 
                     for (i = 0; i < ballsCount; i++) {
-                        moveBallTo(holeKey, nextHoleKey);
-                        this.lastHole = nextHoleKey;
+/*                       Timeline moveDelay = new Timeline(new KeyFrame(Duration.millis(150), event -> {
+                           //Delay...
+                        }));
+                         moveDelay.play();
+*/
+                        MoveBallTo(hole, HOLES.get(nextHoleKey));
+                        this.lastHoleKey = nextHoleKey;
 
                         if (nextHoleKey == P1_MAIN_HOLE_KEY) {
                             nextHoleKey = 6; // the next hole after p1 hole
@@ -240,13 +248,13 @@ public class GameController extends General implements Initializable {
                                 nextHoleKey--;
                             }
                         }
-                        logAction("Last hole: " + this.lastHole, 2);
+                        logAction("Last hole: " + this.lastHoleKey, 2);
                         //make delay
                     }
 
 
-                    //if the last ball get into the player's hole, he will get another turn
-                    if (gameTurn && (this.lastHole == P1_MAIN_HOLE_KEY)) {
+                    // if the last ball get into the player's hole, he will get another turn
+                    if (gameTurn && (this.lastHoleKey == P1_MAIN_HOLE_KEY)) {
                         if (isAllPlayerHolesEmpty(true)) {
                             changeTurn(true);
                         } else {
@@ -255,7 +263,7 @@ public class GameController extends General implements Initializable {
                             new Scale().scale(game_turn_label, 300, 1.1, 2);
                         }
                     } else {
-                        if (!gameTurn && (this.lastHole == P2_MAIN_HOLE_KEY)) {
+                        if (!gameTurn && (this.lastHoleKey == P2_MAIN_HOLE_KEY)) {
                             if (isAllPlayerHolesEmpty(false)) {
                                 changeTurn(false);
                             } else {
@@ -264,36 +272,36 @@ public class GameController extends General implements Initializable {
                                 new Scale().scale(game_turn_label, 300, 1.1, 2);
                             }
                         } else {
-                            int lastHoleBallCount = getHoleBallCount(this.lastHole);
+                            Hole lastHole = HOLES.get(this.lastHoleKey);
+                            short lastHoleBallCount = lastHole.ballCount;
 
                             // If the last ball get into an empty hole of
                             if (gameTurn && lastHoleBallCount == 1 && holeKey != P1_MAIN_HOLE_KEY && holeKey != P2_MAIN_HOLE_KEY) {
-                                short parallelHoleKey = (short) (this.lastHole + 6);
+                                short parallelHoleKey = (short) (this.lastHoleKey + 6);
 
                                 // Take the parallel hole balls just if the last ball of player 1 end in his own hole and the parallel hole have at least 1 ball
                                 // So if the parallelHoleId is grater then 11 it means that the last ball is not landed in the player 1 era
                                 if (parallelHoleKey <= 11) {
                                     // get the parallel hole
+                                    Hole parallelHole = HOLES.get(parallelHoleKey);
 
-
-                                    // Check if the parallel hole have at least 1 ball
-                                    if (getHoleBallCount(parallelHoleKey) > 0) {
+                                    // Check if the parallel hole has at least 1 ball
+                                    if (parallelHole.ballCount > 0) {
                                         logAction("Player 1 last ball got into an empty hole", 1);
 
                                         // Move all the balls from the parallel hole to player 1 hole
-                                        short parallelHoleBallsCount = getHoleBallCount(parallelHoleKey);
-                                        if(parallelHoleBallsCount > 0) {
+                                        if(parallelHole.ballCount > 0) {
                                             achievement_sound();
-                                            for (short j = 0; j < parallelHoleBallsCount; j++) {
-                                                moveBallTo(parallelHoleKey, P1_MAIN_HOLE_KEY);
+                                            for (short j = 0; j < parallelHole.ballCount; j++) {
+                                                MoveBallTo(parallelHole, P1_MAIN_HOLE);
                                             }
                                         }
-                                        // Move the last ball from the last hole to player 1 hole
-                                        moveBallTo(lastHole, P1_MAIN_HOLE_KEY);
+                                        // Move the last ball from the last hole to player 1 main hole
+                                        MoveBallTo(lastHole, P1_MAIN_HOLE);
 
                                         // Update parallelHole and lastHole hole score
-                                        updateScore(parallelHoleKey, true);
-                                        updateScore(lastHole, true);
+                                        parallelHole.updateBallCountLabel(true);
+                                        HOLES.get(lastHoleKey).updateBallCountLabel(true);
                                         changeTurn(false);
                                     }
                                 }
@@ -303,34 +311,35 @@ public class GameController extends General implements Initializable {
                                 changeTurn(isAllPlayerHolesEmpty(true));
 
                             } else if (!gameTurn && (lastHoleBallCount == 1) && holeKey != P1_MAIN_HOLE_KEY && holeKey != P2_MAIN_HOLE_KEY) {
-
-                                short parallelHoleId = (short) (this.lastHole - 6);
+                                short parallelHoleKey = (short) (this.lastHoleKey - 6);
 
                                 // take the parallel hole balls to the player's main hole just if the last ball of player 2 end in his own hole and the parallel hole have at least 1 ball
                                 // so if the parallelHoleId is smaller than 0 it means that the last ball is not landed in the player 2 era
-                                if (parallelHoleId >= 0) {
+                                if (parallelHoleKey >= 0) {
                                     // get the parallel hole
                                     //GridPane parallelHole = getHoleFromId(parallelHoleId);
 
-                                    // check if the parallel hole have at least 1 ball
-                                    if (getHoleBallCount(parallelHoleId) > 0) {
+                                    // get the parallel hole
+                                    Hole parallelHole = HOLES.get(parallelHoleKey);
+
+                                    // Check if the parallel hole has at least 1 ball
+                                    if (parallelHole.ballCount > 0) {
                                         logAction("Player 2 last ball got into an empty hole", 1);
 
                                         // move the balls from the parallel hole and the last hole to player 2 hole
-                                        int parallelHoleBallsCount = getHoleBallCount(parallelHoleId);
-                                        if(parallelHoleBallsCount > 0) {
+                                        if(parallelHole.ballCount > 0) {
                                             achievement_sound();
-                                            for (int j = 0; j < parallelHoleBallsCount; j++) {
-                                                moveBallTo(parallelHoleId, P2_MAIN_HOLE_KEY);
+                                            for (int j = 0; j < parallelHole.ballCount; j++) {
+                                                MoveBallTo(parallelHole, P2_MAIN_HOLE);
                                             }
                                         }
 
                                         // move the last ball from the last hole to player 1 hole
-                                        moveBallTo(lastHole, P2_MAIN_HOLE_KEY);
+                                        MoveBallTo(lastHole, P2_MAIN_HOLE);
 
                                         //update parallelHole and lastHole hole score
-                                        updateScore(parallelHoleId, true);
-                                        updateScore(this.lastHole, true);
+                                        parallelHole.updateBallCountLabel(true);
+                                        lastHole.updateBallCountLabel(true);
                                     }
                                 }
 
@@ -344,10 +353,10 @@ public class GameController extends General implements Initializable {
                     }
 
                     // turn off the highlight of the hole
-                    highlightHole(holeKey, Color.WHEAT, false);
+                    highlightHole(hole, Color.WHEAT, false);
 
                     //update the hole score
-                    setBallAmountToHole(holeKey, (short) 0, true, false);
+                    hole.setBallCount((short) 0, true, false);
                     select_hole_sound();
                     canPlay = true;
                 }
@@ -366,6 +375,194 @@ public class GameController extends General implements Initializable {
     }
 
 
+    /**
+     *  Emulates hole selection
+     * @return
+     * Object[] with two values:
+     * index 0 = the number of balls earned,
+     * index 1 = the AlgorithmType of the algorithm that take effect
+     * if the provided holeKey can't be selected, it will return -1 in index 0 and index 1.
+     * @param holeKey
+     * the holeKey to be select
+     * @param emulatedHoles
+     * the emulated Holes (as the General -> HOLES structure)
+     * @param gameTurn
+     * the player turn: 1 = player 1,
+     * 2 = player 2
+     *
+     */
+    protected Object[] emulateSelectHole(short holeKey, HashMap<Short, Hole> emulatedHoles, boolean gameTurn) {
+        logAction("**emulate** Hole" + holeKey + " selected", 2);
+
+        Hole src = emulatedHoles.get(holeKey);
+        short ballsCount = src.ballCount;
+        short addedScore = 0;
+        AlgorithmType algorithm = nun;
+        Hole mainHole = emulatedHoles.get(gameTurn? P1_MAIN_HOLE_KEY:P2_MAIN_HOLE_KEY);
+        short prevMainHoleBallCount = mainHole.ballCount; // get the amount of balls that in the player's main hole
+
+        boolean canClick; // if the hole can be select (if is the player turn)
+
+        // check if is the player turn (if the player's row can be clicked new)
+        if (gameTurn) {
+            canClick = (holeKey >= 0 && holeKey < 6);
+        } else {
+            canClick = (holeKey >= 6 && holeKey < 12);
+        }
+
+        short nextHoleKey = holeKey;
+        if (canClick && ballsCount > 0) {
+
+            // move every ball in the hole to the next holes
+            if (holeKey == 0) {
+                nextHoleKey = P1_MAIN_HOLE_KEY; // the next hole after p1 hole
+            } else if (holeKey == 11) {
+                nextHoleKey = P2_MAIN_HOLE_KEY; // the next hole after p2 hole
+            } else {
+                // if the holeIndex is in row2 we need to move forward (increase the index by 1) in the holes list
+                if (holeKey >= 6) {
+                    nextHoleKey++;
+                } else {
+                    // if the holeIndex is in row1 we need to move backwards (reduce the index by 1) in the holes list
+                    nextHoleKey--;
+                }
+            }
+            short i;
+            short lastHole = holeKey;
+
+
+            Hole dest;
+
+            for (i = ballsCount; i > 0; i--) {
+
+                if(holeKey != nextHoleKey) {
+
+                    //update source ball count
+                    src.setBallCount(i);
+
+                    // update dest ball count
+                    dest = emulatedHoles.get(nextHoleKey);
+                    dest.incBallCount();
+
+                }
+                lastHole = nextHoleKey;
+
+                if (nextHoleKey == P1_MAIN_HOLE_KEY) {
+                    nextHoleKey = 6; // the next hole after p1 hole
+                } else if (nextHoleKey == P2_MAIN_HOLE_KEY) {
+                    nextHoleKey = 5; // the next hole after p2 hole
+                } else {
+                    //if the holeIndex is in row2, we need to move forward (increase the index by 1) in the holes list
+                    if (nextHoleKey >= 6 && nextHoleKey <= 11) {
+                        nextHoleKey++;
+                    } else {
+                        //if the holeIndex is in row1, we need to move backwards (reduce the index by 1) in the holes list
+                        nextHoleKey--;
+                    }
+                }
+                logAction("**emulate** Last hole: " + lastHole, 2);
+            }
+
+
+            // if the last ball gets into the player's hole, he will get another turn
+            if (gameTurn && (lastHole == P1_MAIN_HOLE_KEY)) {
+                if (!isAllPlayerHolesEmpty(true, emulatedHoles)) {
+                    // player 1 get another turn
+                    algorithm = extraTurn;
+                }
+            }
+            else {
+                if (!gameTurn && (lastHole == P2_MAIN_HOLE_KEY)) {
+                    if (!isAllPlayerHolesEmpty(false, emulatedHoles)) {
+                        // Player 2 get another turn
+                        algorithm = extraTurn;
+                    }
+                } else {
+                    short lastHoleBallCount = emulatedHoles.get(nextHoleKey).ballCount;
+
+                    // If the last ball get into an empty hole
+                    if (gameTurn && lastHoleBallCount == 1 && holeKey != P1_MAIN_HOLE_KEY && holeKey != P2_MAIN_HOLE_KEY) {
+                        short parallelHoleKey = (short) (lastHole + 6);
+
+                        // Take the parallel hole balls just if the last ball of player 1 ends in his own hole and the parallel hole has at least 1 ball
+                        // So if the parallelHoleId is grater then 11 it means that the last ball is not landed in the player 1 era
+                        if (parallelHoleKey <= 11) {
+                            // get the parallel hole
+
+
+                            // Check if the parallel hole has at least 1 ball
+                            short parallelHoleBallsCount = emulatedHoles.get(parallelHoleKey).ballCount;
+                            if (parallelHoleBallsCount > 0) { // getHoleBallCount but more efficient
+                                algorithm = Parallel;
+                                logAction(" **emulate** Player 1 last ball got into an empty hole", 1);
+
+                                // Move all the balls from the parallel hole to player 1 main hole
+                                    Hole parallelHole = emulatedHoles.get(parallelHoleKey);
+
+
+                                    // add the amount of balls that in the parallel hole plus the player's last ball (that get into the empty hole)
+                                    mainHole.setBallCount((short) (mainHole.ballCount + parallelHole.ballCount + 1));
+
+                                    // set the parallel hole ball count to 0
+                                    parallelHole.setBallCount((short) 0);
+
+
+                                // end turn
+                                //changeTurn(false);
+                            }
+                        }
+
+                        // If all player2 holes are empty, player1 get another turn in order to finish the game
+                        // If the ball end in an empty hole of player1, player2 should get the next turn
+                        if(isAllPlayerHolesEmpty(true, emulatedHoles))
+                            algorithm = extraTurn;
+
+
+                    } else if (!gameTurn && (lastHoleBallCount == 1) && holeKey != P1_MAIN_HOLE_KEY && holeKey != P2_MAIN_HOLE_KEY) {
+
+                        short parallelHoleKey = (short) (lastHole - 6);
+
+                        // take the parallel hole balls to the player's main hole just if the last ball of player 2 end in his own hole and the parallel hole have at least 1 ball
+                        // so if the parallelHoleId is smaller than 0 it means that the last ball is not landed in the player 2 era
+
+                        if (parallelHoleKey >= 0) {
+                            // get the parallel hole
+
+                            // Check if the parallel hole has at least 1 ball
+                            short parallelHoleBallsCount = (short)emulatedHoles.get(parallelHoleKey).ballCount;
+                            if (parallelHoleBallsCount > 0) { // getHoleBallCount but more efficient
+
+                                logAction(" **emulate** Player 2 last ball got into an empty hole", 1);
+                                algorithm = Parallel;
+                                Hole parallelHole = emulatedHoles.get(parallelHoleKey);
+                                // add the amount of balls that in the parallel hole plus the player's last ball (that get into the empty hole)
+                                mainHole.setBallCount((short) (mainHole.ballCount + parallelHole.ballCount + 1));
+
+                                // set the parallel hole ball count to 0
+                                parallelHole.setBallCount((short) 0);
+                            }
+                        }
+
+                        // If all player1 holes are empty, player2 get another turn in order to finish the game
+                        // If the ball end in an empty hole of player 2, player 1 should get the next turn
+                        if(!isAllPlayerHolesEmpty(true, emulatedHoles))
+                            algorithm = extraTurn;
+
+                    } else
+                        algorithm = MaxAmount;
+                }
+            }
+            addedScore = (short) (mainHole.ballCount - prevMainHoleBallCount);
+        } else {
+            logAction("**emulate** cant select hole- canClick: " + canClick + ", balls count = " + ballsCount);
+            return new Object[]{-1, nun};
+        }
+
+        return new Object[] {addedScore, algorithm};
+
+    }
+
+
     private void addBallToGrid(GridPane grid, Ball ball, int ballIndex){
         //int ballsCount = getHoleBallCount(grid);
         if( ((double)ballIndex/MAX_ROWS_AND_COLS_IN_GRID) > 1)
@@ -381,7 +578,20 @@ public class GameController extends General implements Initializable {
 
     public void highlightHole(short holeKey, Color color, boolean state){
 
-        Rectangle hole_style = (Rectangle) HOLES.get(holeKey).get(RECTANGLE_INDEX);
+        Rectangle hole_style = HOLES.get(holeKey).rect;
+        if(state)
+        {
+            hole_style.setStroke(color);
+            hole_style.setStrokeWidth(5);
+        }
+        else {
+            hole_style.setStrokeWidth(0);
+        }
+
+    }
+    public void highlightHole(Hole hole, Color color, boolean state){
+
+        Rectangle hole_style = hole.rect;
         if(state)
         {
             hole_style.setStroke(color);
@@ -468,8 +678,8 @@ public class GameController extends General implements Initializable {
             {
                 // If all the holes empty
                 logAction("changeTurn: FOUND that all the holes empty in P1", 1);
-                move_all_player_balls(false, P1_MAIN_HOLE_KEY);
-                showWindow(getHoleBallCount(P1_MAIN_HOLE_KEY), getHoleBallCount(P2_MAIN_HOLE_KEY));
+                move_all_player_balls(false, P1_MAIN_HOLE);
+                showWindow(P1_MAIN_HOLE.ballCount, P2_MAIN_HOLE.ballCount);
             }
             else {
                 game_turn_label.setText("Player 1 turn");
@@ -482,8 +692,8 @@ public class GameController extends General implements Initializable {
             {
                 // If all the holes empty
                 logAction("changeTurn: FOUND that all the holes empty in P2", 1);
-                move_all_player_balls(true, P2_MAIN_HOLE_KEY);
-                showWindow(getHoleBallCount(P1_MAIN_HOLE_KEY), getHoleBallCount(P2_MAIN_HOLE_KEY));
+                move_all_player_balls(true, P2_MAIN_HOLE);
+                showWindow(P1_MAIN_HOLE.ballCount, P2_MAIN_HOLE.ballCount);
             }
             else {
                 game_turn_label.setText("Player 2 turn");
@@ -509,8 +719,32 @@ public class GameController extends General implements Initializable {
             }
         return true;
     }
+
+    /** return true if all the player's hols are empty - with the provided emulatedHoles
+     */
+    protected boolean isAllPlayerHolesEmpty(boolean player, HashMap<Short, Hole> emulatedHoles)
+    {
+
+        short test;
+        //System.out.println("******"+emulatedHoles);
+        if(player)
+            for (short i = 0; i < 6; i++) {
+                test = emulatedHoles.get(i).ballCount;
+                logAction("+++=====::: " + test);
+                if (emulatedHoles.get(i).ballCount > 0)
+                    return false;
+            }
+        else
+            for (short i = 6; i < 12; i++) {
+                if (emulatedHoles.get(i).ballCount > 0)
+                    return false;
+            }
+        return true;
+    }
+
+
     //Move all the balls of the source player to the target hole
-    private void move_all_player_balls(boolean source_player, short target_hole) {
+    private void move_all_player_balls(boolean source_player, Hole target_hole) {
 
         short startHoleId;
         short endHoleId;
@@ -526,50 +760,51 @@ public class GameController extends General implements Initializable {
         }
 
         // Move all the balls of the source player to the target hole
-        logAction("Move all the balls of the source player: " + (source_player? "P1":"P2") + ", to the target hole: " + target_hole, 1);
+        logAction("Move all the balls of the source player: " + (source_player? "P1":"P2") + ", to the target hole: " + target_hole.holeKey, 1);
         short j, holeBallCount;
+        Hole hole;
         for (short i = startHoleId; i <= endHoleId; i++) {
             holeBallCount = getHoleBallCount(i);
             if(holeBallCount > 0){
+                hole = HOLES.get(i);
+
                 for (j = 0; j <= holeBallCount; j++) {
                     //logAction("-----"+ i +", count " + getHoleBallCount(holes[i]), 1);
-                    moveBallTo(i, target_hole);
-                    //moveAllBallsInHoleWithTransition(holesGrid[i], target_hole);
+                    MoveBallTo(hole, target_hole);
                 }
-                updateScore(i, true);
+                hole.updateBallCountLabel(true);
             }
         }
     }
-    //move one ball from the source hole to destination hole
-    // with no animation, to move with animation use moveBallToWithTransition, but it is not work
-    public void moveBallTo(short source, short dest)
+
+
+    public void MoveBallTo(Hole source, Hole dest)
     {
-        short sourceBallCount = getHoleBallCount(source);
-        short destBallCount = getHoleBallCount(dest);
+
         if(source == dest)
         {
             logAction("The source is equal to the destination! (it could be ok in case of hole with 14 or more balls)", 1);
         }
-        else if(sourceBallCount > 0) { // If there is at least 1 ball in the hole
+        else if(source.ballCount > 0) {
+            // If there is at least 1 ball in the hole
 
-           logAction("Move ball from source: " + source + " (Ball count: " + sourceBallCount + ")" + ", to the destination: " + dest + " (Ball count: " + destBallCount+ ") ", 2);
+           logAction("Move ball from source: " + source + ", to the destination: " + dest, 2);
 
-            GridPane sourceGrid = (GridPane)HOLES.get(source).get(GRID_INDEX);
-            GridPane destGrid = (GridPane)HOLES.get(dest).get(GRID_INDEX);
+            GridPane sourceGrid = source.grid;
+            GridPane destGrid = dest.grid;
 
             // Move the ball to the destination hole
             Ball ball = (Ball) sourceGrid.getChildren().getLast();
 
             // Move the ball to the destination
-            addBallToGrid(destGrid, ball, destBallCount);
+            addBallToGrid(destGrid, ball, dest.ballCount);
 
-            // Update the balls amount on the source
-            setBallAmountToHole(source, (short)(sourceBallCount-1), true, false);
+            // Update the ball amount on the source
+            source.decBallCount(true);
 
 
             // Update the destination hole score
-            destBallCount++;
-            setBallAmountToHole(dest, destBallCount,true, false);
+            dest.incBallCount(true);
 
             // Make pop animation
             Scale scale = new Scale();
@@ -584,14 +819,6 @@ public class GameController extends General implements Initializable {
         }
     }
 
-    // Set a new ball amount to holeKey
-    protected void setBallAmountToHole(short holeKey,short ballsAmount , boolean updateUI, boolean updateUIWithAnimation){
-        HOLES.get(holeKey).set(BALLS_COUNT_INDEX, ballsAmount);
-        if(updateUI)
-        {
-         updateScore(holeKey, updateUIWithAnimation);
-        }
-    }
     private short getHoleKey(AnchorPane hole)
     {
         short id;
@@ -617,17 +844,6 @@ public class GameController extends General implements Initializable {
         }
         logAction("GetHoleKey (from Grid) func return: " + id, 3);
         return id;
-    }
-
-    //update the hole Label score (UI only)
-    public void updateScore(short holeKey, boolean withAnimation){
-        Label hole_score = (Label) HOLES.get(holeKey).get(LABLE_INDEX);
-        hole_score.setText(String.valueOf((short) HOLES.get(holeKey).getFirst()));
-
-        if(withAnimation)
-        {
-            new FadeAnimation().fadeAnimation(hole_score, 300, false);
-        }
     }
 
     private void showWindow(short player1_score, short player2_score) {
@@ -683,7 +899,7 @@ public class GameController extends General implements Initializable {
     // Start a new game with the same setting (PVP or PVC or CVC)
     @FXML
     protected void start_new_game() throws Exception{
-        startGame(new Stage(), GAME_TYPE);
+        new General().startGame(new Stage(), GAME_TYPE);
     }
 
 
@@ -745,8 +961,7 @@ public class GameController extends General implements Initializable {
     }
 
 
-    /** this function get the amount of balls in each hole and the CPU player (P1 = ture, P2 = false)
-        * and return the hole index to be clicked.
+    /** this function get the CPU player (P1 = ture, P2 = false) and return the hole index to be select by the CPU algorithm.
         * if select set to true the hole will be selected, if false, the hole will only be highlighted
      **/
     public void CPUAction(boolean CPU_player, boolean select)  {
@@ -754,23 +969,7 @@ public class GameController extends General implements Initializable {
         if(!isGameOver) {
             logAction("Wait for CPU action");
 
-            //list with 2 parameters - index 0 = the start holeKey of the player and index 1 = the last holeKey of the player.
-            short[] holesRange = CPU_player ? P1_holesRange : P2_holesRange;
-
-
-            short holeKey = bestHoleForParallelRol(CPU_player, holesRange);
-            logAction("bestHoleForParallelRol: "+ holeKey);
-
-            if(holeKey == -1){
-                holeKey = bestHoleToGetAnotherTurn(CPU_player, holesRange);
-                logAction("bestHoleToGetAnotherTurn: "+ holeKey);
-            }
-            if(holeKey == -1)
-            {
-                holeKey = getMaxBallsHole(CPU_player, holesRange);
-                logAction("getMaxBallsHole: "+ holeKey);
-            }
-
+            short holeKey = Look_ahead_algorithm(CPU_player);
 
             GridPane holeGrid = getGridFromHoleKey(holeKey);
 
@@ -805,8 +1004,55 @@ public class GameController extends General implements Initializable {
     }
 
 
+    /** This function get the CPU player (true = player1 false = player 2)
+     *  run the cpu algorithm (it select the hole only by looking the current state - not run the- Look-Ahead Algorithm) and return the result
+     */
+    protected short CPU_hole_selector(boolean CPU_player, short[] holesRange){
+
+        short holeKey = bestHoleForParallelRol(CPU_player, holesRange);
+        logAction("CPUAction: Best Hole For Parallel Rol: "+ holeKey);
+
+        if(holeKey == -1){
+            holeKey = bestHoleToGetAnotherTurn(CPU_player, holesRange);
+            logAction("CPUAction: Best Hole To Get Another Turn: "+ holeKey);
+        }
+        if(holeKey == -1)
+        {
+            holeKey = getMaxBallsHole(CPU_player, holesRange);
+            logAction("CPUAction: Get Max Balls Hole: "+ holeKey);
+        }
+
+        return holeKey;
+    }
+
+    /**
+     * Look-Ahead Algorithm
+     *
+     * Going over each hole of the player and checking how many balls each choice earns the player.
+     * If another turn is received, we will run the algorithm again on all the holes and add the balls we earned in this step to the previous run.
+     */
+    protected short Look_ahead_algorithm(boolean CPU_player){
+        HashMap<Short, Hole> holesCopy = (HashMap<Short, Hole>) HOLES.clone();
+        boolean extraTurnRole = false;
+        short score = 0;
+
+
+        //list with 2 parameters - index 0 = the start holeKey of the player and index 1 = the last holeKey of the player.
+        short[] holesRange = CPU_player ? P1_holesRange : P2_holesRange;
+        short holeKey = CPU_hole_selector(CPU_player, holesRange);
+
+        // Find the hole that can get the most score
+        for (short i = (short) (holesRange[0] + 1); i<= holesRange[1]; i++){
+
+
+        }
+
+        return holeKey;
+    }
+
+
     /** This function returns the holeKey that you can use to apply the law of parallelism
-     * if there is no hole that can applay the rol- return -1
+     * if there is no hole that can apply the rol- return -1
      **/
     protected short bestHoleForParallelRol(boolean player, short[] holesRange) {
         short parallelHoleBallsCount;
@@ -824,8 +1070,8 @@ public class GameController extends General implements Initializable {
                  * if the there is no balls in the end hole and the end hole is of this player and the amount of balls in the parallel hole if more then 0
                  * the parallel law can be used
                  * */
-                logAction("get parallel hole for: " + holeKey + "if: " + (endHole != -1 && endHole != 12 && getHoleBallCount(endHole) == 0 && (PlayerOfHoleKey(endHole) == player) && parallelHoleBallsCount > 0), 2);
-                if (endHole != -1 && endHole != 12 && getHoleBallCount(endHole) == 0 && (PlayerOfHoleKey(endHole) == player) && parallelHoleBallsCount > 0) {
+                logAction("get parallel hole for: " + holeKey + "if: " + (endHole != P1_MAIN_HOLE_KEY && endHole != P2_MAIN_HOLE_KEY && getHoleBallCount(endHole) == 0 && (PlayerOfHoleKey(endHole) == player) && parallelHoleBallsCount > 0), 2);
+                if (endHole != P1_MAIN_HOLE_KEY && endHole != P2_MAIN_HOLE_KEY && getHoleBallCount(endHole) == 0 && (PlayerOfHoleKey(endHole) == player) && parallelHoleBallsCount > 0) {
                     if (maxParallelHoleBalls < parallelHoleBallsCount) {
                         maxParallelHoleBalls = parallelHoleBallsCount;
                         maxHoleKey = holeKey;
@@ -870,13 +1116,13 @@ public class GameController extends General implements Initializable {
 
             while (ballCount > 0) {
                 if (PlayerOfHoleKey(endHoleKey)) {
-                    if (endHoleKey == -1)
+                    if (endHoleKey == P1_MAIN_HOLE_KEY)
                         endHoleKey = 6;
                     else
                         endHoleKey--;
                     //logAction(endHoleKey + "++++");
                 } else {
-                    if (endHoleKey == 12)
+                    if (endHoleKey == P2_MAIN_HOLE_KEY)
                         endHoleKey = 5;
                     else
                         endHoleKey++;
@@ -893,14 +1139,16 @@ public class GameController extends General implements Initializable {
     // This function returns the holeKey that can give you another turn
     // -1 = hole not found.
     public short bestHoleToGetAnotherTurn(boolean player, short[] holesRange)  {
+        logAction(player+"///");
         short holeKey = -1;
         short ballCount;
         if(player)
         {
+
             for (short key = holesRange[0]; key <= holesRange[1]; key++)
             {
                 ballCount = getHoleBallCount(key);
-                if(ballCount > 0 && (key - ballCount == -1 || key -ballCount == 0))
+                if(ballCount > 0 && (key - ballCount == P1_MAIN_HOLE_KEY))
                 {
                     holeKey = key;
                     break;
@@ -908,10 +1156,13 @@ public class GameController extends General implements Initializable {
             }
         }
         else {
-            for (short key = holesRange[0]; key <= holesRange[1]; key++)
+            // The order for player2 is from the end to start hole because it better to select the hole that is closer to the main hole
+            // This approach can get an extra turn in case the last hole has one ball and the hole in the start has two balls
+            // (in this case you can get 3 turns compared to scanning from start to finish)
+            for (short key = holesRange[1]; key >= holesRange[0]; key--)
             {
                 ballCount = getHoleBallCount(key);
-                if(ballCount > 0 && (key + getHoleBallCount(key) == 12 || key + getHoleBallCount(key) == 11))
+                if(ballCount > 0 && (key + getHoleBallCount(key) == P2_MAIN_HOLE_KEY))
                 {
                     holeKey = key;
                     break;

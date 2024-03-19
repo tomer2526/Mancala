@@ -5,9 +5,11 @@ import javafx.scene.control.Button;
 import javafx.scene.effect.Glow;
 import javafx.scene.input.MouseEvent;
 
+import javax.print.attribute.standard.Media;
 import javax.sound.sampled.*;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 
 public class UIUX {
     public static boolean gameSound = true;
@@ -39,6 +41,15 @@ public class UIUX {
             e.printStackTrace();
         }
     }
+
+//    private static void playSound(String sound){
+//        // cl is the ClassLoader for the current class, ie. CurrentClass.class.getClassLoader();
+//        URL file = cl.getResource(sound);
+//        final Media media = new Media(file.toString());
+//        final MediaPlayer mediaPlayer = new MediaPlayer(media);
+//        mediaPlayer.play();
+//    }
+
     @FXML
     protected void small_btn_in_sound() throws Exception{
         playSound("src/main/resources/assets/sound effects/small btn sound - in.wav");

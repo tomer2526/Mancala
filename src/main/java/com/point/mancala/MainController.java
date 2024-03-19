@@ -5,32 +5,26 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import javax.sound.sampled.UnsupportedAudioFileException;
-import java.io.IOException;
-
 import static com.point.mancala.GameType.*;
 import static com.point.mancala.General.*;
 
 public class MainController extends UIUX {
     public static Stage primaryStage;
 
-    public MainController() throws UnsupportedAudioFileException, IOException {
-    }
-
     @FXML
     protected void pvpClick() throws Exception {
         //open new game window
-        startGame(new Stage(), PVP);
+        new General().startGame(new Stage(), PVP);
     }
     @FXML
     protected void pvcClick() throws Exception {
         //open new game window
-        startGame(new Stage(), PVC);
+        new General().startGame(new Stage(), PVC);
     }
     @FXML
     protected void cvcClick() throws Exception {
         //open new game window
-        startGame(new Stage(), CVC);
+        new General().startGame(new Stage(), CVC);
     }
 
     @FXML

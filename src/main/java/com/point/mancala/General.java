@@ -8,26 +8,25 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.point.mancala.GameType.*;
 
 public class General extends UIUX {
     protected static GameType GAME_TYPE;
     // The name of the Game
-    protected static String GAME_TYPE_NAME;
+    protected String GAME_TYPE_NAME;
     protected final boolean developmentMode = true;
     protected static final List<Color> COLORS = List.of(Color.GREEN, Color.RED, Color.BLUE, Color.ORANGE);
     //ArrayList<Short> holesBallsCount = new ArrayList<Short>(12); // a list that contain the amount of balls in each hole (include the mains)
-    HashMap<Short, ArrayList<Object>> HOLES = new HashMap<>(14); // hasMap that contain the index of the hole in the key and a list of the hole data
-    //example: holeIndex: {(the amount of balls), (gridHole object), (AnchorPane object) (Rectangle shape) (ball count label object), (GridPane grid) }
+    HashMap<Short, Hole> HOLES = new HashMap<>(14); // hasMap that contain the index of the hole in the key and a list of the hole data
+    //example: holeIndex: {(the amount of balls), (GridPane object), (AnchorPane object) (Rectangle shape) (ball count label object) }
     // index -1 = P1 main hole, 12 = P2 main hole
+    // *** butter solution for the ArrayList<Object> will be to build data structure
     protected final short P1_MAIN_HOLE_KEY = -1;
     protected final short P2_MAIN_HOLE_KEY = 12;
-    protected final short BALLS_COUNT_INDEX = 0;
-    protected final short GRID_INDEX = 1;
-    protected final short ANCHORPANE_INDEX = 2;
-    protected final short RECTANGLE_INDEX = 3;
-    protected final short LABLE_INDEX = 4;
+    protected Hole P1_MAIN_HOLE;
+    protected Hole P2_MAIN_HOLE;
 
     // The range of player1 holeKeys that can be selected
     protected static final short[] P1_holesRange = {0,5};
@@ -35,7 +34,7 @@ public class General extends UIUX {
     protected static final short[] P2_holesRange = {6 ,11};
 
 
-    public static void startGame(Stage primaryStage, GameType type) throws IOException {
+    public void startGame(Stage primaryStage, GameType type) throws IOException {
         GAME_TYPE = type;
         if(type == PVP)
             GAME_TYPE_NAME = "Player VS Player";
@@ -54,18 +53,30 @@ public class General extends UIUX {
         primaryStage.show();
     }
 
-    //return the amount of balls int the provided hole
+    public static HashMap<Short, Hole> deepCopyHashMap(HashMap<Short, Hole> original) {
+        HashMap<Short, Hole> copy = new HashMap<>(original.size());
+
+        for (Short key : original.keySet()) {
+            Hole originalHole = original.get(key);
+            Hole copiedHole = new Hole(originalHole); // Using copy constructor
+            copy.put(key, copiedHole);
+        }
+
+        return copy;
+    }
+
+
+    /**return the number of balls in the provided hole
+     */
     protected short getHoleBallCount(short holeKey)
     {
-        //return hole.getChildren().size() - BALLS_START_INDEX;
-        return (short) HOLES.get(holeKey).getFirst(); // BALLS_COUNT_INDEX -> firstIndex
+        return HOLES.get(holeKey).ballCount;
     }
+
+
     protected GridPane getGridFromHoleKey(short holeKey){
-            return (GridPane) HOLES.get(holeKey).get(1);
+            return HOLES.get(holeKey).grid;
     }
-
-
-
 
     // print log message
     // importance: the level of importance of this log.
