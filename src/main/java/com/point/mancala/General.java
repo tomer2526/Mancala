@@ -5,10 +5,8 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static com.point.mancala.GameType.*;
 
@@ -53,15 +51,24 @@ public class General extends UIUX {
         primaryStage.show();
     }
 
-    public static HashMap<Short, Hole> deepCopyHashMap(HashMap<Short, Hole> original) {
-        HashMap<Short, Hole> copy = new HashMap<>(original.size());
+    public static HashMap<Short, BasicHole> deepCopyHoleHashMap(HashMap<Short, Hole> original) {
+        HashMap<Short, BasicHole> copy = new HashMap<>(original.size());
 
-        for (Short key : original.keySet()) {
+        for (short key = -1; key <= 12; key++) {
             Hole originalHole = original.get(key);
-            Hole copiedHole = new Hole(originalHole); // Using copy constructor
-            copy.put(key, copiedHole);
+            //BasicHole copiedHole = ; // Using copy constructor
+            copy.put(key, new BasicHole(originalHole));
         }
+        return copy;
+    }
+    public static HashMap<Short, BasicHole> deepCopyBasicHoleHashMap(HashMap<Short, BasicHole> original) {
+        HashMap<Short, BasicHole> copy = new HashMap<>(original.size());
 
+        for (short key = -1; key <= 12; key++) {
+            BasicHole originalHole = original.get(key);
+            //BasicHole copiedHole = ; // Using copy constructor
+            copy.put(key, new BasicHole(originalHole));
+        }
         return copy;
     }
 
