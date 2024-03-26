@@ -61,6 +61,7 @@ public class General extends UIUX {
         }
         return copy;
     }
+
     public static HashMap<Short, BasicHole> deepCopyBasicHoleHashMap(HashMap<Short, BasicHole> original) {
         HashMap<Short, BasicHole> copy = new HashMap<>(original.size());
 
@@ -78,6 +79,12 @@ public class General extends UIUX {
     protected short getHoleBallCount(short holeKey)
     {
         return HOLES.get(holeKey).ballCount;
+    }
+    /**return the number of balls in the provided hole from the emulatedHoles
+     */
+    protected short getHoleBallCount(short holeKey, HashMap<Short, BasicHole> emulatedHoles)
+    {
+        return emulatedHoles.get(holeKey).ballCount;
     }
 
 
