@@ -17,10 +17,12 @@ public class Main extends Application {
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("main-menu.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
-        stage.setTitle("Mancala V1 Beta");
+        stage.setTitle("Mancala V1 Alpha");
         stage.setScene(scene);
-        stage.setResizable(false);
+        stage.setResizable(true);
         stage.show();
+        stage.maxWidthProperty().bind(stage.widthProperty());
+        stage.minWidthProperty().bind(stage.widthProperty());
     }
 
 

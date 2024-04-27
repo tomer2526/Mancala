@@ -1,13 +1,5 @@
 package com.point.mancala.Animations;
 
-import javafx.animation.*;
-import javafx.fxml.FXML;
-import javafx.scene.Node;
-import javafx.scene.layout.Pane;
-import javafx.scene.transform.Rotate;
-import javafx.util.Duration;
-import java.io.IOException;
-
 public class Animations{
     public static boolean inTransition = false;
 

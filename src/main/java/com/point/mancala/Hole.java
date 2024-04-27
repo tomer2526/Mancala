@@ -24,15 +24,7 @@ public class Hole extends BasicHole {
         this.rect = rect;
         this.label = label;
     }
-//    // Copy constructor for deep copy
-//    public Hole(Hole original) {
-//        super(original.holeKey, original.ballCount);
-//        // Assuming that grid, anchorPane, rect, and label are immutable, so we don't need to make deep copies of them
-//        this.grid = original.grid;
-//        this.anchorPane = original.anchorPane;
-//        this.rect = original.rect;
-//        this.label = original.label;
-//    }
+
     public void setBallCount(short newScore, boolean updateUI, boolean withAnimation){
         this.ballCount = newScore;
         if (updateUI){

@@ -5,15 +5,20 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import java.io.IOException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ResourceBundle;
 
 import static com.point.mancala.GameType.*;
 
 public class General extends UIUX {
     protected static GameType GAME_TYPE;
     // The name of the Game
-    protected String GAME_TYPE_NAME;
+    static protected String GAME_TYPE_NAME;
+
+    static protected GameDifficulty CPU1_GD = GameDifficulty.hard;
+    static protected GameDifficulty CPU2_GD = GameDifficulty.hard;
     protected final boolean developmentMode = true;
     protected static final List<Color> COLORS = List.of(Color.GREEN, Color.RED, Color.BLUE, Color.ORANGE);
     //ArrayList<Short> holesBallsCount = new ArrayList<Short>(12); // a list that contain the amount of balls in each hole (include the mains)
@@ -51,6 +56,17 @@ public class General extends UIUX {
         primaryStage.show();
     }
 
+    public void startGame(Stage primaryStage, GameType type, GameDifficulty CPU2_gd) throws IOException {
+        CPU1_GD = GameDifficulty.hard;
+        CPU2_GD = CPU2_gd;
+        startGame(primaryStage, type);
+    }
+    public void startGame(Stage primaryStage, GameType type, GameDifficulty CPU1_gd, GameDifficulty CPU2_gd) throws IOException {
+        CPU1_GD = CPU1_gd;
+        CPU2_GD = CPU2_gd;
+        startGame(primaryStage, type);
+    }
+
     public static HashMap<Short, BasicHole> deepCopyHoleHashMap(HashMap<Short, Hole> original) {
         HashMap<Short, BasicHole> copy = new HashMap<>(original.size());
 
@@ -80,6 +96,7 @@ public class General extends UIUX {
     {
         return HOLES.get(holeKey).ballCount;
     }
+
     /**return the number of balls in the provided hole from the emulatedHoles
      */
     protected short getHoleBallCount(short holeKey, HashMap<Short, BasicHole> emulatedHoles)
@@ -124,4 +141,5 @@ public class General extends UIUX {
     {
         logAction(String.valueOf(message), 2);
     }
+
 }

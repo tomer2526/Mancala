@@ -10,8 +10,9 @@ import javax.sound.sampled.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ResourceBundle;
 
-public class UIUX {
+public abstract class UIUX {
     public static boolean gameSound = true;
 
     // Play sound (wav files)
@@ -51,51 +52,66 @@ public class UIUX {
 //    }
 
     @FXML
-    protected void small_btn_in_sound() throws Exception{
+    protected void small_btn_in_sound() throws Exception {
         playSound("src/main/resources/assets/sound effects/small btn sound - in.wav");
     }
+
     @FXML
-    protected void small_btn_out_sound() throws Exception{
+    protected void small_btn_out_sound() throws Exception {
         playSound("src/main/resources/assets/sound effects/small btn sound - out.wav");
     }
+
     protected void select_hole_sound() {
-        if(gameSound)
+        if (gameSound)
             playSound("src/main/resources/assets/sound effects/select hole sound.wav");
     }
+
     protected void disable_hole_sound() {
-        if(gameSound)
+        if (gameSound)
             playSound("src/main/resources/assets/sound effects/disable btn sound.wav");
     }
+
     protected void hover_sound() {
-        if(gameSound)
+        if (gameSound)
             playSound("src/main/resources/assets/sound effects/hover sound.wav");
     }
+
     protected void disable_hover_sound() {
-        if(gameSound)
+        if (gameSound)
             playSound("src/main/resources/assets/sound effects/disable hover sound.wav");
     }
+
     protected void disable_btn_sound() {
-        if(gameSound)
+        if (gameSound)
             playSound("src/main/resources/assets/sound effects/disable btn sound.wav");
     }
+
     protected void achievement_sound() {
-        if(gameSound)
+        if (gameSound)
             playSound("src/main/resources/assets/sound effects/achievement sound.wav");
     }
+
     protected void bonus_turn_sound() {
-        if(gameSound)
+        if (gameSound)
             playSound("src/main/resources/assets/sound effects/bonus turn sound.wav");
     }
 
+    protected void start_game_sound() {
+        if (gameSound)
+            playSound("src/main/resources/assets/sound effects/start game sound.wav");
+    }
 
 
     // set glow effect on buttons when hover
     @FXML
-    protected void btn_hover_effect_on(MouseEvent event){
-        ((Button)event.getSource()).setEffect(new Glow(0.3));
+    protected void btn_hover_effect_on(MouseEvent event) {
+        ((Button) event.getSource()).setEffect(new Glow(0.3));
     }
+
     @FXML
-    protected void btn_hover_effect_off(MouseEvent event){
-        ((Button)event.getSource()).setEffect(new Glow(0));
+    protected void btn_hover_effect_off(MouseEvent event) {
+        ((Button) event.getSource()).setEffect(new Glow(0));
     }
 }
+
+
