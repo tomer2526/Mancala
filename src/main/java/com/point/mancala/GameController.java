@@ -1070,21 +1070,19 @@ public class GameController extends General implements Initializable {
 
             //System.out.println("\t after emu:"+ emulatedHolesCopy);
 
-            // if this hole get extra turn
-            // add the next score to this score (by calling this function again with the current emulatedHolesCopy)
-            if((AlgorithmType) emulateSelectHole[1] == extraTurn) {
-                //logAction("\n");
-                logAction("     ***extra turn for holekey: " + key + ", current count: " + score, 3);
-                // if easy mode, don't get the score from the next step
-                if ((CPU_player && CPU1_GD != GameDifficulty.easy) || (!CPU_player && CPU2_GD != GameDifficulty.easy)){
+            // if easy mode, don't get the score from the next step
+            if ((CPU_player && CPU1_GD != GameDifficulty.easy) || (!CPU_player && CPU2_GD != GameDifficulty.easy)) {
+
+                // if this hole get extra turn
+                // add the next score to this score (by calling this function again with the current emulatedHolesCopy)
+                if ((AlgorithmType) emulateSelectHole[1] == extraTurn) {
+                    logAction("     ***extra turn for holekey: " + key + ", current count: " + score, 3);
+
                     // get the score from the next step
                     score += Look_ahead_algorithmV1(CPU_player, emulatedHolesCopy)[1];
-                    logAction("1111111111");
-            }
-                else {
-                    logAction("00000000000");
+
+                    logAction("         next Score: " + score, 3);
                 }
-                logAction("         next Score: " + score, 3);
             }
 
             if(max[1] < score)

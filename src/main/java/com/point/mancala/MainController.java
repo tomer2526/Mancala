@@ -95,6 +95,11 @@ public class MainController extends UIUX implements Initializable {
     }
 
     private void ChooseDifficulty(GameType gt){
+        try {
+            small_btn_in_sound();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         cpu2_difficulty_layout.setDisable(gt == PVC);
 
         gameMode_layout.setVisible(false);
