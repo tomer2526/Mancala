@@ -17,7 +17,7 @@ public class Main extends Application {
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("main-menu.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
-        stage.setTitle("Mancala V1 Alpha");
+        stage.setTitle("Mancala V1");
         stage.setScene(scene);
         stage.setResizable(true);
         stage.show();
