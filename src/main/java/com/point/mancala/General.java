@@ -78,6 +78,7 @@ public class General extends UIUX {
         return copy;
     }
 
+    // O(1) - alwaze 12 values
     public static HashMap<Short, BasicHole> deepCopyBasicHoleHashMap(HashMap<Short, BasicHole> original) {
         HashMap<Short, BasicHole> copy = new HashMap<>(original.size());
 

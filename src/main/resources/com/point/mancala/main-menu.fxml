@@ -227,7 +227,7 @@
       </VBox>
       <BorderPane minHeight="-Infinity">
          <left>
-            <Button id="button" fx:id="instructions" mnemonicParsing="false" onAction="#instructions" onMousePressed="#small_btn_in_sound" onMouseReleased="#small_btn_out_sound" prefHeight="50.0" prefWidth="50.0" text="i" textAlignment="CENTER" textFill="#543304" BorderPane.alignment="CENTER">
+            <Button id="button" fx:id="instructions" mnemonicParsing="false" onAction="#instructions" onMousePressed="#small_btn_in_sound" onMouseReleased="#small_btn_out_sound" prefHeight="50.0" prefWidth="50.0" text="i" textAlignment="CENTER" textFill="#543304" visible="false" BorderPane.alignment="CENTER">
                <font>
                   <Font name="Coda ExtraBold" size="20.0" />
                </font>

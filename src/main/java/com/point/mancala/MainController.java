@@ -122,9 +122,6 @@ public class MainController extends UIUX implements Initializable {
 
         gameMode_layout.setVisible(true);
         gameMode_layout.managedProperty().bind(gameMode_layout.visibleProperty());
-
-
-
     }
 
     private void checkBtn(boolean player, GameDifficulty gd) {

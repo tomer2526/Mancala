@@ -4,34 +4,20 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.effect.Glow;
 import javafx.scene.input.MouseEvent;
-
-import javax.print.attribute.standard.Media;
 import javax.sound.sampled.*;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
-import java.util.ResourceBundle;
 
 public abstract class UIUX {
     public static boolean gameSound = true;
 
     // Play sound (wav files)
     public static void playSound(String filePath) {
-        //System.out.println(filePath);
         try {
             AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(filePath));
 
             Clip clip = AudioSystem.getClip();
             clip.open(audioInputStream);
-
-//            clip.addLineListener(new LineListener() {
-//                @Override
-//                public void update(LineEvent event) {
-//                    if (event.getType() == LineEvent.Type.STOP) {
-//                        clip.close();
-//                    }
-//                }
-//            });
 
             // Start playing the sound in a separate thread
             new Thread(clip::start).start();
@@ -42,14 +28,6 @@ public abstract class UIUX {
             e.printStackTrace();
         }
     }
-
-//    private static void playSound(String sound){
-//        // cl is the ClassLoader for the current class, ie. CurrentClass.class.getClassLoader();
-//        URL file = cl.getResource(sound);
-//        final Media media = new Media(file.toString());
-//        final MediaPlayer mediaPlayer = new MediaPlayer(media);
-//        mediaPlayer.play();
-//    }
 
     @FXML
     protected void small_btn_in_sound() throws Exception {

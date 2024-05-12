@@ -31,14 +31,15 @@ import static com.point.mancala.GameType.*;
 public class GameController extends General implements Initializable {
     private static final short START_BALL_COUNT = 4; // The number of balls in each hole in the start of the game
     final static int MAX_ROWS_AND_COLS_IN_GRID = 15; // the max rows and columns in every grid (16-1)
-    protected int[][] gridArr = {{2, 1}, {2, 2}, {1, 2}, {1, 1}, {1, 0}, {2, 0}, {3, 0}, {3, 1}, {3, 2}, {3, 3}, {2, 3}, {1, 3}, {0, 3}, {0, 2}, {0, 1}, {0, 0}}; // this arr stores the location of each of the ball in the grid, for example, the first ball should be located in 1,1 (in the center of the grid)
+    protected int[][] gridArr = {{2, 1}, {2, 2}, {1, 2}, {1, 1}, {1, 0}, {2, 0}, {3, 0}, {3, 1}, {3, 2}, {3, 3}, {2, 3}, {1, 3}, {0, 3}, {0, 2}, {0, 1}, {0, 0}}; // this arr stores the location of each of the balls in the grid, for example, the first ball should be located in 1,1 (in the center of the grid)
     protected AnchorPane[] holes;
     protected boolean canPlay = true; // Indicate if any player can play, when loading time is over it will be trues
     protected boolean isGameOver = false; // if a player win this var will be true;
-    protected boolean pause = false; // if the user pause the game;
+    protected boolean pause = false; // if the user pauses the game;
     protected boolean gameTurn = true; // Player 1 turn = true, player 2 false
     protected short lastHoleKey; // The last holeKey that a ball got into
     protected final Duration dellay = Duration.millis(500);
+    Random rand = new Random();
 
     // if the user pauses the game and the CPU selects hole after the pause, it will get into the waitingQueue
     // and will be selected and will be selected after the user resumes the game
@@ -80,6 +81,8 @@ public class GameController extends General implements Initializable {
     @FXML
     private Button soundToggle;
 
+    private short counter = 0;
+
 
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
@@ -109,6 +112,8 @@ public class GameController extends General implements Initializable {
         GridPane grid;
         Label label;
 
+        logAction("P1 mode: " + CPU1_GD + "\nP2 mode: " + CPU2_GD);
+
         if (true) {
             for (short holeKey = 0; holeKey < 12; holeKey++) {
                 AnchorPane holeAnchorPane = holes[holeKey];
@@ -134,7 +139,7 @@ public class GameController extends General implements Initializable {
         else {
             // test with balls in hols that are in the list: insertBalls_holes
 
-            HashMap<Short, Short> testHoles = getShortShortHashMap();
+            HashMap<Short, Short> testHoles = makeTestGame();
             // print
             logAction("initial set with: " + testHoles);
 
@@ -172,7 +177,7 @@ public class GameController extends General implements Initializable {
         }
     }
 
-    private static HashMap<Short, Short> getShortShortHashMap() {
+    private static HashMap<Short, Short> makeTestGame() {
         HashMap<Short, Short> testHoles = new HashMap<>(14);
 
         // reset all the holes with 0 balls
@@ -180,11 +185,12 @@ public class GameController extends General implements Initializable {
             testHoles.put(key, (short) 0);
         }
 
-        testHoles.put((short) 0, (short) 3);
+        testHoles.put((short) 0, (short) 1);
         testHoles.put((short) 1, (short) 2);
-        testHoles.put((short) 2, (short) 10);
-        testHoles.put((short) 4, (short) 3);
-        testHoles.put((short) 5, (short) 2);
+        testHoles.put((short) 2, (short) 3);
+        testHoles.put((short) 3, (short) 4);
+        testHoles.put((short) 4, (short) 5);
+        testHoles.put((short) 5, (short) 6);
 
         testHoles.put((short) 6, (short) 1);
         testHoles.put((short) 7, (short) 1);
@@ -197,7 +203,6 @@ public class GameController extends General implements Initializable {
     /** Generates a random integer between 0 (inclusive) and 4 (exclusive), which effectively covers 0 to max (up to max, not included max).
      */
     public int generateRandomNumber(int max) {
-        Random rand = new Random();
         return rand.nextInt(max);
     }
     protected void selectHole(short holeKey) {
@@ -387,6 +392,7 @@ public class GameController extends General implements Initializable {
      * index 0 = the number of balls earned,
      * index 1 = the AlgorithmType of the algorithm that take effect
      * if the provided holeKey can't be selected, it will return -1 in index 0 and index 1.
+     * O(N)
      */
     protected Object[] emulateSelectHole(short holeKey, HashMap<Short, BasicHole> emulatedHoles, boolean gameTurn) {
         logAction("     **emulate** Hole" + holeKey + " selected", 2);
@@ -430,6 +436,7 @@ public class GameController extends General implements Initializable {
 
             BasicHole dest;
 
+            //O(n)
             for (i = (short)(ballsCount-1); i >= 0; i--) {
 
                 if (holeKey != nextHoleKey) {
@@ -481,7 +488,7 @@ public class GameController extends General implements Initializable {
 
                     // If the last ball get into an empty hole
                     if (gameTurn && lastHoleBallCount == 1)// && holeKey != P1_MAIN_HOLE_KEY && holeKey != P2_MAIN_HOLE_KEY)
-                         {
+                        {
                         short parallelHoleKey = (short) (lastHole + 6);
 
                         // Take the parallel hole balls just if the last ball of player 1 ends in his own hole and the parallel hole has at least 1 ball
@@ -512,10 +519,8 @@ public class GameController extends General implements Initializable {
 
                         // If all player2 holes are empty, player1 get another turn in order to finish the game
                         // If the ball end in an empty hole of player1, player2 should get the next turn
-                        if (isAllEmuletedPlayerHolesEmpty(true, emulatedHoles))
+                        if (isAllEmuletedPlayerHolesEmpty(true, emulatedHoles)) // O(1)
                             algorithm = extraTurn;
-
-
                     }
                     else if (!gameTurn && (lastHoleBallCount == 1))// && holeKey != P1_MAIN_HOLE_KEY && holeKey != P2_MAIN_HOLE_KEY)
                     {
@@ -705,6 +710,7 @@ public class GameController extends General implements Initializable {
     }
 
 
+    // O(1)
     protected boolean isAllEmuletedPlayerHolesEmpty(boolean player, HashMap<Short, BasicHole> emulatedHoles) {
         if (player)
             for (short i = 0; i < 6; i++) {
@@ -918,12 +924,14 @@ public class GameController extends General implements Initializable {
 
         if (!isGameOver) {
             logAction("--------------------------------------------\nWait for CPU action");
-
-            short holeKey = Look_ahead_algorithmV1(CPU_player, GameController.deepCopyHoleHashMap(HOLES))[0];
+            counter = 0;
+            // laa = look ahead algorithm
+            short laa[] = Look_for_best_move(CPU_player, GameController.deepCopyHoleHashMap(HOLES)); //o(n)
+            short holeKey = laa[0];
             Hole hole = HOLES.get(holeKey);
             GridPane holeGrid = hole.grid;
 
-            logAction("CPU choice: " + holeKey);
+            logAction("CPU choice: " + holeKey + ", ern: " + laa[1] + " points.");
             highlightHole(hole, Color.RED, true);
             hover_sound();
 
@@ -953,21 +961,22 @@ public class GameController extends General implements Initializable {
     }
 
     /**
-     * Look-Ahead Algorithm
+     * Look_for_best_move Algorithm
      * <p>
      * Going over each hole of the player and checking how many balls each choice earns the player.
      * If another turn is received, we will run the algorithm again on all the holes and add the balls we earned in this step to the previous run.
      *
      * @return an array of short:
-     * index 1 = the holeKey to select
-     * index 2 = the score ern with this move
+     * index 0 = the holeKey to select
+     * index 1 = the score ern with this move
      */
-    protected short[] Look_ahead_algorithmV1(boolean CPU_player, HashMap<Short, BasicHole> emulatedHoles) {
-        logAction("     Look_ahead_algorithm: " + CPU_player);
-        //boolean extraTurnRole = false;
+    protected short[] Look_for_best_move(boolean CPU_player, HashMap<Short, BasicHole> emulatedHoles) {
+        logAction("     Look_for_best_move: " + CPU_player);
         HashMap<Short, BasicHole> emulatedHolesCopy;
 
-        //list with 2 parameters - index 0 = the start holeKey of the player and index 1 = the last holeKey of the player.
+        // list with 2 parameters:
+        // index 0 = the start holeKey of the player
+        // index 1 = the last holeKey of the player.
         short[] holesRange = CPU_player ? P1_holesRange : P2_holesRange;
 
         short score;
@@ -979,28 +988,49 @@ public class GameController extends General implements Initializable {
         do {
             logAction("         test hole:" + key);
             // reset the emulatedHolesCopy
-            emulatedHolesCopy = deepCopyBasicHoleHashMap(emulatedHoles);
-            //System.out.println("\t before emu:"+emulatedHolesCopy);
+            emulatedHolesCopy = deepCopyBasicHoleHashMap(emulatedHoles); // o(1)
 
+            emulateSelectHole = emulateSelectHole(key, emulatedHolesCopy ,CPU_player); //O(N)
 
-            emulateSelectHole = emulateSelectHole(key, emulatedHolesCopy ,CPU_player);
             score = (short) emulateSelectHole[0]; // get the number of balls ern with this hole of the player
 
-            //System.out.println("\t after emu:"+ emulatedHolesCopy);
+//            logAction("Player: " + CPU_player +", TEST1: " + ((CPU_player && (CPU1_GD != GameDifficulty.easy)) || (!CPU_player && (CPU2_GD != GameDifficulty.easy))));
+//            logAction("Player: " + CPU_player +", TEST2: " + (emulateSelectHole[1] == extraTurn));
+//            logAction("Player: " + CPU_player +", TEST3: " + ( ((CPU_player && (CPU1_GD == GameDifficulty.hard)) || (!CPU_player && (CPU2_GD == GameDifficulty.hard))) ));
+//            logAction("Player: " + CPU_player +", TEST3.1: " + counter );
+//            logAction("Player: " + CPU_player +", TEST3.2: " + ( true? (counter < 3):(counter < 1)));
+//            logAction("Player: " + CPU_player +", TEST3.3: " + ( ((CPU_player && (CPU1_GD == GameDifficulty.hard)) || (!CPU_player && (CPU2_GD == GameDifficulty.hard)))? (counter > 3):(counter > 1)));
+//            //logAction("TEST4: " + );
 
             // if easy mode, don't get the score from the next step
-            if ((CPU_player && CPU1_GD != GameDifficulty.easy) || (!CPU_player && CPU2_GD != GameDifficulty.easy)) {
+            if ((CPU_player && (CPU1_GD != GameDifficulty.easy)) || (!CPU_player && (CPU2_GD != GameDifficulty.easy))) {
 
-                // if this hole get extra turn
-                // add the next score to this score (by calling this function again with the current emulatedHolesCopy)
-                if (emulateSelectHole[1] == extraTurn) {
-                    logAction("     ***extra turn for holekey: " + key + ", current count: " + score, 3);
+/*                // if the mode set is to hard, get the score from the next step.
+                // if the mode set is set to normal, get the score from the next step in 70% chance (with a random num).
+                int chance = rand.nextInt(10);
+                if( ((CPU_player && (CPU1_GD == GameDifficulty.hard)) || (!CPU_player && (CPU2_GD == GameDifficulty.hard)) ) || ( ((CPU_player && (CPU1_GD == GameDifficulty.normal)) || (!CPU_player && (CPU2_GD == GameDifficulty.normal))) && chance > 0)) {
+*/
+                    // if this hole get extra turn
+                    // add the next score to this score (by calling this function again with the current emulatedHolesCopy)
+                    if (emulateSelectHole[1] == extraTurn) {
+                        logAction("     ***extra turn for holekey: " + key + ", current count: " + score, 3);
 
-                    // get the score from the next step
-                    score += Look_ahead_algorithmV1(CPU_player, emulatedHolesCopy)[1];
+                        // if the mode is hard, limit the recursion to 3, if normal set the limit to 1
+                        if( ((CPU_player && (CPU1_GD == GameDifficulty.hard)) || (!CPU_player && (CPU2_GD == GameDifficulty.hard)))? (counter > 3):(counter > 1))
+                        {
+                            logAction("reset counter");
+                            counter = 0;
+                        }
+                        else {
+                            logAction("get the score from the next step");
+                            counter++;
+                            // get the score from the next step
+                            score += Look_for_best_move(CPU_player, emulatedHolesCopy)[1];
+                        }
 
-                    logAction("         next Score: " + score, 3);
-                }
+                        logAction("         next Score: " + score, 2);
+                    }
+               // }
             }
 
             if(max[1] < score)
@@ -1009,20 +1039,23 @@ public class GameController extends General implements Initializable {
                 max[1] = score;
                 max[0] = key;
             }
-            //emulatedHolesCopy = null;
             key++;
 
         }while (key <= holesRange[1]);
 
-        // if the selected hole have no balls select the hole with the max amount of balls
+        // if the selected hole has no balls, select the hole with the max number of balls
         if(max[1] == 0)
         {
             max[0] = getMaxBallsHole(holesRange, emulatedHoles); // get holeKey with the maximum number of balls
-            max[1] = getHoleBallCount(max[0], emulatedHoles); // get the number of balls for this hole
-            logAction("         Now maxKey: " + max[0] + " ern balls Count: " + max[1]);
+
+            emulatedHolesCopy = deepCopyBasicHoleHashMap(emulatedHoles);
+            emulateSelectHole = emulateSelectHole(max[0], emulatedHolesCopy ,CPU_player);
+            max[1] = (short) emulateSelectHole[0]; // get the number of balls ern with this hole of the player
+
+            logAction("         Now maxKey: " + max[0] + " ern : " + max[1] + " points");
         }
 
-        logAction("     Look_ahead_algorithm RETURN::: key:" + max[0] + " score: " + max[1]);
+        logAction("     Look_for_best_move RETURN::: key:" + max[0] + " score: " + max[1]);
         logAction("\n");
         return max;
     }
