@@ -564,10 +564,9 @@ public class GameController extends General implements Initializable {
 
 
     private void addBallToGrid(GridPane grid, Ball ball, int ballIndex) {
-        //int ballsCount = getHoleBallCount(grid);
+
         if (((double) ballIndex / MAX_ROWS_AND_COLS_IN_GRID) > 1)
             ballIndex = (ballIndex - MAX_ROWS_AND_COLS_IN_GRID * (ballIndex / MAX_ROWS_AND_COLS_IN_GRID)); // if the index number is more than the MAX_ROWS_AND_COLS_IN_GRID, then add the ball to an existing index(start the index count again)
-        //ballIndex = (int) (ballIndex - 16*(Math.floor(ballIndex/16)));
 
         int col = gridArr[ballIndex][0];
         int row = gridArr[ballIndex][1];
@@ -980,7 +979,7 @@ public class GameController extends General implements Initializable {
         short[] holesRange = CPU_player ? P1_holesRange : P2_holesRange;
 
         short score;
-        short[] max = {holesRange[0],0}; // index 1 = the holeKey to select, index 2 = the score ern with this move
+        short[] max = {holesRange[0], 0}; // index 1 = the holeKey to select, index 2 = the score ern with this move
         Object[] emulateSelectHole;
 
         // Find the hole that can get the most score
@@ -990,66 +989,46 @@ public class GameController extends General implements Initializable {
             // reset the emulatedHolesCopy
             emulatedHolesCopy = deepCopyBasicHoleHashMap(emulatedHoles); // o(1)
 
-            emulateSelectHole = emulateSelectHole(key, emulatedHolesCopy ,CPU_player); //O(N)
+            emulateSelectHole = emulateSelectHole(key, emulatedHolesCopy, CPU_player); //O(N)
 
             score = (short) emulateSelectHole[0]; // get the number of balls ern with this hole of the player
 
-//            logAction("Player: " + CPU_player +", TEST1: " + ((CPU_player && (CPU1_GD != GameDifficulty.easy)) || (!CPU_player && (CPU2_GD != GameDifficulty.easy))));
-//            logAction("Player: " + CPU_player +", TEST2: " + (emulateSelectHole[1] == extraTurn));
-//            logAction("Player: " + CPU_player +", TEST3: " + ( ((CPU_player && (CPU1_GD == GameDifficulty.hard)) || (!CPU_player && (CPU2_GD == GameDifficulty.hard))) ));
-//            logAction("Player: " + CPU_player +", TEST3.1: " + counter );
-//            logAction("Player: " + CPU_player +", TEST3.2: " + ( true? (counter < 3):(counter < 1)));
-//            logAction("Player: " + CPU_player +", TEST3.3: " + ( ((CPU_player && (CPU1_GD == GameDifficulty.hard)) || (!CPU_player && (CPU2_GD == GameDifficulty.hard)))? (counter > 3):(counter > 1)));
-//            //logAction("TEST4: " + );
-
             // if easy mode, don't get the score from the next step
             if ((CPU_player && (CPU1_GD != GameDifficulty.easy)) || (!CPU_player && (CPU2_GD != GameDifficulty.easy))) {
+                // if this hole get extra turn
+                // add the next score to this score (by calling this function again with the current emulatedHolesCopy)
+                if (emulateSelectHole[1] == extraTurn) {
+                    logAction("     ***extra turn for holekey: " + key + ", current count: " + score, 3);
 
-/*                // if the mode set is to hard, get the score from the next step.
-                // if the mode set is set to normal, get the score from the next step in 70% chance (with a random num).
-                int chance = rand.nextInt(10);
-                if( ((CPU_player && (CPU1_GD == GameDifficulty.hard)) || (!CPU_player && (CPU2_GD == GameDifficulty.hard)) ) || ( ((CPU_player && (CPU1_GD == GameDifficulty.normal)) || (!CPU_player && (CPU2_GD == GameDifficulty.normal))) && chance > 0)) {
-*/
-                    // if this hole get extra turn
-                    // add the next score to this score (by calling this function again with the current emulatedHolesCopy)
-                    if (emulateSelectHole[1] == extraTurn) {
-                        logAction("     ***extra turn for holekey: " + key + ", current count: " + score, 3);
-
-                        // if the mode is hard, limit the recursion to 3, if normal set the limit to 1
-                        if( ((CPU_player && (CPU1_GD == GameDifficulty.hard)) || (!CPU_player && (CPU2_GD == GameDifficulty.hard)))? (counter > 3):(counter > 1))
-                        {
-                            logAction("reset counter");
-                            counter = 0;
-                        }
-                        else {
-                            logAction("get the score from the next step");
-                            counter++;
-                            // get the score from the next step
-                            score += Look_for_best_move(CPU_player, emulatedHolesCopy)[1];
-                        }
-
-                        logAction("         next Score: " + score, 2);
+                    // if the mode is hard, limit the recursion to 3, if normal set the limit to 1
+                    if (((CPU_player && (CPU1_GD == GameDifficulty.hard)) || (!CPU_player && (CPU2_GD == GameDifficulty.hard))) ? (counter > 3) : (counter > 1)) {
+                        logAction("reset counter");
+                        counter = 0;
+                    } else {
+                        logAction("get the score from the next step");
+                        counter++;
+                        // get the score from the next step
+                        score += Look_for_best_move(CPU_player, emulatedHolesCopy)[1];
                     }
-               // }
+                    logAction("         next Score: " + score, 2);
+                }
             }
-
-            if(max[1] < score)
-            {
+            //if the new score is grater, then the previos, update the max hole
+            if (max[1] < score) {
                 logAction("             Now maxKey: " + key + " ern balls Count: " + score);
                 max[1] = score;
                 max[0] = key;
             }
             key++;
 
-        }while (key <= holesRange[1]);
+        } while (key <= holesRange[1]);
 
         // if the selected hole has no balls, select the hole with the max number of balls
-        if(max[1] == 0)
-        {
+        if (max[1] == 0) {
             max[0] = getMaxBallsHole(holesRange, emulatedHoles); // get holeKey with the maximum number of balls
 
             emulatedHolesCopy = deepCopyBasicHoleHashMap(emulatedHoles);
-            emulateSelectHole = emulateSelectHole(max[0], emulatedHolesCopy ,CPU_player);
+            emulateSelectHole = emulateSelectHole(max[0], emulatedHolesCopy, CPU_player);
             max[1] = (short) emulateSelectHole[0]; // get the number of balls ern with this hole of the player
 
             logAction("         Now maxKey: " + max[0] + " ern : " + max[1] + " points");
