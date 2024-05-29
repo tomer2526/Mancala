@@ -17,13 +17,10 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
-
 import static com.point.mancala.AlgorithmType.*;
 import static com.point.mancala.GameType.*;
 
@@ -38,12 +35,13 @@ public class GameController extends General implements Initializable {
     protected boolean pause = false; // if the user pauses the game;
     protected boolean gameTurn = true; // Player 1 turn = true, player 2 false
     protected short lastHoleKey; // The last holeKey that a ball got into
-    protected final Duration dellay = Duration.millis(500);
+    protected final Duration delay = Duration.millis(500);
     Random rand = new Random();
 
-    // if the user pauses the game and the CPU selects hole after the pause, it will get into the waitingQueue
-    // and will be selected and will be selected after the user resumes the game
-    // if waitingQueue = -2 it means that there is nothing in the queue
+    /* if the user pauses the game and the CPU selects hole after the pause, it will get into the waitingQueue
+    * and will be selected and will be selected after the user resumes the game
+    * if waitingQueue = -2 it means that there is nothing in the queue
+    */
     protected short waitingQueue = -2;
 
     @FXML
@@ -432,11 +430,10 @@ public class GameController extends General implements Initializable {
             }
             short i;
             short lastHole = holeKey;
-
-
             BasicHole dest;
 
             //O(n)
+
             for (i = (short)(ballsCount-1); i >= 0; i--) {
 
                 if (holeKey != nextHoleKey) {
@@ -464,7 +461,6 @@ public class GameController extends General implements Initializable {
                         nextHoleKey--;
                     }
                 }
-                //logAction("**emulate** Last hole: " + lastHole, 2);
             }
 
 
@@ -503,17 +499,11 @@ public class GameController extends General implements Initializable {
                                 algorithm = Parallel;
                                 logAction("         **emulate** Player 1 last ball got into an empty hole", 1);
 
-                                // Move all the balls from the parallel hole to player 1 main hole
-
                                 // add the amount of balls that in the parallel hole plus the player's last ball (that get into the empty hole)
                                 mainHole.setBallCount((short) (mainHole.ballCount + parallelHole.ballCount + 1));
 
                                 // set the parallel hole ball count to 0
                                 parallelHole.setBallCount((short) 0);
-
-
-                                // end turn
-                                //changeTurn(false);
                             }
                         }
 
@@ -925,7 +915,7 @@ public class GameController extends General implements Initializable {
             logAction("--------------------------------------------\nWait for CPU action");
             counter = 0;
             // laa = look ahead algorithm
-            short laa[] = Look_for_best_move(CPU_player, GameController.deepCopyHoleHashMap(HOLES)); //o(n)
+            short laa[] = Look_for_best_move(CPU_player, GameController.deepCopyHoleHashMap(HOLES)); //o(n^3) or o(n)
             short holeKey = laa[0];
             Hole hole = HOLES.get(holeKey);
             GridPane holeGrid = hole.grid;
@@ -937,7 +927,7 @@ public class GameController extends General implements Initializable {
             // if select is true, the hole will be selected, if false, the hole will only be highlighted
             if (select) {
                 // Set delay for select
-                Timeline timeline = new Timeline(new KeyFrame(dellay, e -> {
+                Timeline timeline = new Timeline(new KeyFrame(delay, e -> {
                     // Code that interacts with UI elements
                     logAction("Delay done, now select the hole: " + holeKey, 3);
 
@@ -970,7 +960,7 @@ public class GameController extends General implements Initializable {
      * index 1 = the score ern with this move
      */
     protected short[] Look_for_best_move(boolean CPU_player, HashMap<Short, BasicHole> emulatedHoles) {
-        logAction("     Look_for_best_move: " + CPU_player);
+        logAction("     Look_for_best_move: " + CPU_player, 2);
         HashMap<Short, BasicHole> emulatedHolesCopy;
 
         // list with 2 parameters:
@@ -985,7 +975,7 @@ public class GameController extends General implements Initializable {
         // Find the hole that can get the most score
         short key = holesRange[0];
         do {
-            logAction("         test hole:" + key);
+            logAction("         test hole:" + key, 2);
             // reset the emulatedHolesCopy
             emulatedHolesCopy = deepCopyBasicHoleHashMap(emulatedHoles); // o(1)
 
@@ -1005,17 +995,20 @@ public class GameController extends General implements Initializable {
                         logAction("reset counter");
                         counter = 0;
                     } else {
-                        logAction("get the score from the next step");
+                        logAction("&&&&&&&&- " + CPU_player, 2);
+                        logAction("get the score from the next step", 2);
                         counter++;
                         // get the score from the next step
+                        //backtracking Recursion
                         score += Look_for_best_move(CPU_player, emulatedHolesCopy)[1];
                     }
                     logAction("         next Score: " + score, 2);
                 }
             }
+
             //if the new score is grater, then the previos, update the max hole
             if (max[1] < score) {
-                logAction("             Now maxKey: " + key + " ern balls Count: " + score);
+                logAction("             Now maxKey: " + key + " ern balls Count: " + score, 2);
                 max[1] = score;
                 max[0] = key;
             }
@@ -1031,11 +1024,11 @@ public class GameController extends General implements Initializable {
             emulateSelectHole = emulateSelectHole(max[0], emulatedHolesCopy, CPU_player);
             max[1] = (short) emulateSelectHole[0]; // get the number of balls ern with this hole of the player
 
-            logAction("         Now maxKey: " + max[0] + " ern : " + max[1] + " points");
+            logAction("         Now maxKey: " + max[0] + " ern : " + max[1] + " points", 2);
         }
 
-        logAction("     Look_for_best_move RETURN::: key:" + max[0] + " score: " + max[1]);
-        logAction("\n");
+        logAction("     Look_for_best_move RETURN::: key:" + max[0] + " score: " + max[1], 2);
+        logAction("\n", 2);
         return max;
     }
 

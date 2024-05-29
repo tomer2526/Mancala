@@ -5,10 +5,8 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import java.io.IOException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ResourceBundle;
 
 import static com.point.mancala.GameType.*;
 
@@ -19,13 +17,10 @@ public class General extends UIUX {
 
     static protected GameDifficulty CPU1_GD = GameDifficulty.hard;
     static protected GameDifficulty CPU2_GD = GameDifficulty.hard;
-    protected final boolean developmentMode = true;
+    //protected final boolean developmentMode = true;
     protected static final List<Color> COLORS = List.of(Color.GREEN, Color.RED, Color.BLUE, Color.ORANGE);
-    //ArrayList<Short> holesBallsCount = new ArrayList<Short>(12); // a list that contain the amount of balls in each hole (include the mains)
     HashMap<Short, Hole> HOLES = new HashMap<>(14); // hasMap that contain the index of the hole in the key and a list of the hole data
-    //example: holeIndex: {(the amount of balls), (GridPane object), (AnchorPane object) (Rectangle shape) (ball count label object) }
-    // index -1 = P1 main hole, 12 = P2 main hole
-    // *** butter solution for the ArrayList<Object> will be to build data structure
+
     protected final short P1_MAIN_HOLE_KEY = -1;
     protected final short P2_MAIN_HOLE_KEY = 12;
     protected Hole P1_MAIN_HOLE;
@@ -48,13 +43,14 @@ public class General extends UIUX {
 
         logAction("start game type: " + type, 2);
 
-        playSound("src/main/resources/assets/sound effects/start game sound.wav");
+        start_game_sound();
         FXMLLoader fxmlLoader = new FXMLLoader(Game.class.getResource("game.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         primaryStage.setTitle(GAME_TYPE_NAME);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
+
 
     public void startGame(Stage primaryStage, GameType type, GameDifficulty CPU2_gd) throws IOException {
         CPU1_GD = GameDifficulty.hard;

@@ -100,6 +100,18 @@ public class MainController extends UIUX implements Initializable {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        //reset select
+        CPU1_diff = null;
+        CPU2_diff = null;
+        CPU1_Eazy.setId("button");
+        CPU1_Normal.setId("button");
+        CPU1_Hard.setId("button");
+
+        CPU2_Eazy.setId("button");
+        CPU2_Normal.setId("button");
+        CPU2_Hard.setId("button");
+
+
         cpu2_difficulty_layout.setDisable(gt == PVC);
 
         gameMode_layout.setVisible(false);
