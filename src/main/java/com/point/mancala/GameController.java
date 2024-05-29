@@ -186,9 +186,9 @@ public class GameController extends General implements Initializable {
         testHoles.put((short) 0, (short) 1);
         testHoles.put((short) 1, (short) 2);
         testHoles.put((short) 2, (short) 3);
-        testHoles.put((short) 3, (short) 4);
+        testHoles.put((short) 1, (short) 4);
         testHoles.put((short) 4, (short) 5);
-        testHoles.put((short) 5, (short) 6);
+        testHoles.put((short) 4, (short) 6);
 
         testHoles.put((short) 6, (short) 1);
         testHoles.put((short) 7, (short) 1);
@@ -210,7 +210,7 @@ public class GameController extends General implements Initializable {
                 waitingQueue = holeKey;
             }
             else {
-                Hole hole = HOLES.get(holeKey); //O(n)
+                Hole hole = HOLES.get(holeKey); //O(1)
                 short ballsCount = hole.ballCount;
                 short i;
                 logAction(("Hole: " + hole + " selected"), 2);
@@ -261,16 +261,15 @@ public class GameController extends General implements Initializable {
                             }
                         }
                         logAction("Last hole: " + this.lastHoleKey, 3);
-                        //make delay
                     }
 
 
-                    // if the last ball get into the player's hole, he will get another turn
-                    if (this.lastHoleKey == P1_MAIN_HOLE_KEY || this.lastHoleKey == P2_MAIN_HOLE_KEY) {
+                    // if the last ball gets into the player's hole, the player will get another turn
+                    if ((gameTurn && this.lastHoleKey == P1_MAIN_HOLE_KEY) || (gameTurn && this.lastHoleKey == P2_MAIN_HOLE_KEY)) {
                         if (isAllPlayerHolesEmpty(gameTurn)) {
                             changeTurn(gameTurn);
                         } else {
-                            // player 1 get another turn
+                            // The player gets another turn
                             bonus_turn_sound();
                             new Scale().scale(game_turn_label, 300, 1.1, 2);
                         }
@@ -281,7 +280,7 @@ public class GameController extends General implements Initializable {
                             short lastHoleBallCount = lastHole.ballCount;
 
                             // If the last ball get into an empty hole of the player
-                            if (gameTurn && lastHoleBallCount == 1) // && holeKey != P1_MAIN_HOLE_KEY && holeKey != P2_MAIN_HOLE_KEY)
+                            if ( (gameTurn && lastHoleBallCount == 1) && holeKey != P1_MAIN_HOLE_KEY && holeKey != P2_MAIN_HOLE_KEY)
                             {
                                 short parallelHoleKey = (short) (this.lastHoleKey + 6);
 
@@ -317,7 +316,7 @@ public class GameController extends General implements Initializable {
                                 changeTurn(isAllPlayerHolesEmpty(true));
 
                             }
-                            else if (!gameTurn && (lastHoleBallCount == 1))
+                            else if (!gameTurn && (lastHoleBallCount == 1) && holeKey != P1_MAIN_HOLE_KEY && holeKey != P2_MAIN_HOLE_KEY)
                             {
                                 short parallelHoleKey = (short) (this.lastHoleKey - 6);
 
@@ -352,9 +351,9 @@ public class GameController extends General implements Initializable {
                                 // If the ball end in an empty hole of player 2, player 1 should get the next turn
                                 changeTurn(!isAllPlayerHolesEmpty(true));
 
-                            } else
+                            }
+                            else
                                 changeTurn(!gameTurn);
-
                     }
 
                     // turn off the highlight of the hole
@@ -433,7 +432,7 @@ public class GameController extends General implements Initializable {
             BasicHole dest;
 
             //O(n)
-
+            // depandes on the number of balls in the hole
             for (i = (short)(ballsCount-1); i >= 0; i--) {
 
                 if (holeKey != nextHoleKey) {
@@ -998,6 +997,7 @@ public class GameController extends General implements Initializable {
                         logAction("&&&&&&&&- " + CPU_player, 2);
                         logAction("get the score from the next step", 2);
                         counter++;
+
                         // get the score from the next step
                         //backtracking Recursion
                         score += Look_for_best_move(CPU_player, emulatedHolesCopy)[1];
