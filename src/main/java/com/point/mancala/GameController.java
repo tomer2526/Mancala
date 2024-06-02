@@ -164,7 +164,6 @@ public class GameController extends General implements Initializable {
                     }
                 }
             }
-
         }
 
         // CPU action (if the CPU turn and not PVP mode)
