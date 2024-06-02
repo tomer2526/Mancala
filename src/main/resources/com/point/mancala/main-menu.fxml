@@ -63,7 +63,7 @@
                    </DropShadow>
                </effect>
            </Button>
-           <Button id="button" fx:id="cvc" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#cvcClick" onMousePressed="#small_btn_in_sound" onMouseReleased="#small_btn_out_sound" text="CPU VS CPU" textAlignment="CENTER" textFill="#543304">
+           <Button id="button" fx:id="cvc" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#cvcClick" onMousePressed="#small_btn_in_sound" onMouseReleased="#small_btn_out_sound" text="CPU VS CPU (Beta)" textAlignment="CENTER" textFill="#543304">
                <font>
                    <Font name="Coda ExtraBold" size="22.0" />
                </font>

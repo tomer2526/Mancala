@@ -6,8 +6,8 @@ module com.point.mancala.mancala {
 
     opens com.point.mancala to javafx.fxml;
     exports com.point.mancala;
-    exports com.point.mancala.notInUse;
-    opens com.point.mancala.notInUse to javafx.fxml;
+
+
     exports com.point.mancala.Animations;
     opens com.point.mancala.Animations to javafx.fxml;
 }

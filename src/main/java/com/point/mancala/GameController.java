@@ -958,6 +958,7 @@ public class GameController extends General implements Initializable {
      * index 0 = the holeKey to select
      * index 1 = the score ern with this move
      */
+
     protected short[] Look_for_best_move(boolean CPU_player, HashMap<Short, BasicHole> emulatedHoles) {
         logAction("     Look_for_best_move: " + CPU_player, 2);
         HashMap<Short, BasicHole> emulatedHolesCopy;
